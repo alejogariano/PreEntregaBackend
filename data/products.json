@@ -1,0 +1,145 @@
+[
+  {
+    "title": "Camiseta de River Plate - Local",
+    "description": "Réplica de la camiseta oficial de River Plate para partidos en el Monumental.",
+    "code": "RP-001",
+    "price": 99.999,
+    "thumbnails": [
+      "river_local.jpg"
+    ],
+    "id": 1,
+    "stock": 95,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Boca Juniors - Local",
+    "description": "Réplica de la camiseta oficial de Boca Juniors para partidos en La Bombonera.",
+    "code": "BJ-001",
+    "price": 99.999,
+    "thumbnails": [
+      "boca_local.jpg"
+    ],
+    "id": 2,
+    "stock": 100,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Independiente - Local",
+    "description": "Réplica de la camiseta oficial de Independiente para partidos en el Estadio Libertadores de América.",
+    "code": "IND-001",
+    "price": 99.999,
+    "thumbnails": [
+      "independiente_local.jpg"
+    ],
+    "id": 3,
+    "stock": 90,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Racing Club - Local",
+    "description": "Réplica de la camiseta oficial de Racing Club para partidos en el Estadio Presidente Perón.",
+    "code": "RC-001",
+    "price": 99.999,
+    "thumbnails": [
+      "racing_local.jpg"
+    ],
+    "id": 4,
+    "stock": 85,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de San Lorenzo - Local",
+    "description": "Réplica de la camiseta oficial de San Lorenzo para partidos en el Estadio Pedro Bidegain.",
+    "code": "SL-001",
+    "price": 99.999,
+    "thumbnails": [
+      "san_lorenzo_local.jpg"
+    ],
+    "id": 5,
+    "stock": 80,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Huracán - Local",
+    "description": "Réplica de la camiseta oficial de Huracán para partidos en el Estadio Tomás Adolfo Ducó.",
+    "code": "HUR-001",
+    "price": 99.999,
+    "thumbnails": [
+      "huracan_local.jpg"
+    ],
+    "id": 6,
+    "stock": 75,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Vélez Sarsfield - Local",
+    "description": "Réplica de la camiseta oficial de Vélez Sarsfield para partidos en el Estadio José Amalfitani.",
+    "code": "VS-001",
+    "price": 99.999,
+    "thumbnails": [
+      "velez_local.jpg"
+    ],
+    "id": 7,
+    "stock": 70,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Argentinos Juniors - Local",
+    "description": "Réplica de la camiseta oficial de Argentinos Juniors para partidos en el Estadio Diego Armando Maradona.",
+    "code": "AJ-001",
+    "price": 99.999,
+    "thumbnails": [
+      "argentinos_local.jpg"
+    ],
+    "id": 8,
+    "stock": 65,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Lanús - Local",
+    "description": "Réplica de la camiseta oficial de Lanús para partidos en el Estadio Ciudad de Lanús - Néstor Díaz Pérez.",
+    "code": "LAN-001",
+    "price": 99.999,
+    "thumbnails": [
+      "lanus_local.jpg"
+    ],
+    "id": 9,
+    "stock": 60,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "title": "Camiseta de Estudiantes de La Plata - Local",
+    "description": "Réplica de la camiseta oficial de Estudiantes de La Plata para partidos en el Estadio Jorge Luis Hirschi.",
+    "code": "EDLP-001",
+    "price": 199.999,
+    "thumbnails": [
+      "estudiantes_local.jpg"
+    ],
+    "id": 10,
+    "stock": 50,
+    "category": "Fútbol",
+    "status": true
+  },
+  {
+    "id": "4fdb7f35-95ad-4b1a-9f7e-27437b020dbe",
+    "title": "Camiseta de Defensa y Justicia",
+    "description": "Réplica de la camiseta oficial de Defensa y Justicia.",
+    "code": "DF-001",
+    "price": 99.999,
+    "stock": 100,
+    "category": "Fútbol",
+    "thumbnails": [
+      "defensayjusticia1.jpg"
+    ],
+    "status": true
+  }
+]
