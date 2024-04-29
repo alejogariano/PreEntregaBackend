@@ -120,13 +120,26 @@
     "title": "Camiseta de Estudiantes de La Plata - Local",
     "description": "Réplica de la camiseta oficial de Estudiantes de La Plata para partidos en el Estadio Jorge Luis Hirschi.",
     "code": "EDLP-001",
-    "price": 199.999,
+    "price": 99.999,
     "thumbnails": [
       "estudiantes_local.jpg"
     ],
     "id": 10,
     "stock": 50,
     "category": "Fútbol",
+    "status": true
+  },
+  {
+    "id": "25a2524c-44bc-4e43-96a0-28b37a3a76a0",
+    "title": "Camiseta de Deportivo Moron",
+    "description": "Réplica de la camiseta oficial de Moron.",
+    "code": "MOR-001",
+    "price": 99.999,
+    "stock": 100,
+    "category": "Fútbol",
+    "thumbnails": [
+      "moron1.jpg"
+    ],
     "status": true
   }
 ]

@@ -8,44 +8,38 @@ class ProductManager {
         this.currentId = 1;
     }
 
-    init() {
+    async init() {
         try {
-            const data = fs.readFileSync(this.filename, 'utf8');
-            this.products = JSON.parse(data);
-            const lastProduct = this.products[this.products.length - 1];
-            if (lastProduct) {
-                this.currentId = lastProduct.id + 1;
-            }
+            await fs.promises.access(this.filename);
+            await this.loadProducts();
         } catch (error) {
             if (error.code === 'ENOENT') {
-                this.saveProducts([]);
+                await this.saveProducts([]);
             } else {
                 throw error;
             }
         }
     }
 
-    saveProducts(products) {
+    async loadProducts() {
+        const data = await fs.promises.readFile(this.filename, 'utf8');
+        this.products = JSON.parse(data);
+        const lastProduct = this.products[this.products.length - 1];
+        if (lastProduct) {
+            this.currentId = lastProduct.id + 1;
+        }
+    }
+
+    async saveProducts(products) {
         try {
-            const existingData = fs.readFileSync(this.filename, 'utf8');
-            const existingProducts = JSON.parse(existingData);
-            const newData = JSON.stringify([...existingProducts, ...products], null, 2);
-            fs.writeFileSync(this.filename, newData);
+            await fs.promises.writeFile(this.filename, JSON.stringify(products, null, 2));
         } catch (error) {
             throw new Error(`Error al guardar los productos: ${error.message}`);
         }
     }
-    
-    loadProducts() {
-        try {
-            const data = fs.readFileSync(this.filename, 'utf8');
-            this.products = JSON.parse(data);
-        } catch (error) {
-            throw new Error(`Error al cargar los productos: ${error.message}`);
-        }
-    }
 
-    getProducts() {
+
+    async getProducts() {
         return this.products;
     }
 
@@ -79,7 +73,7 @@ class ProductManager {
         return newProduct;
     }
 
-    getProductById(id) {
+    async getProductById(id) {
         const productId = parseInt(id);
         const product = this.products.find(product => product.id === productId);
         if (!product) {
@@ -88,14 +82,15 @@ class ProductManager {
         return product;
     }
 
-    updateProduct(id, updatedFields) {
-        
-        const productIndex = this.products.findIndex(product => product.id === id);
+
+    async updateProduct(id, updatedFields) {
+        const productId = parseInt(id);
+        const productIndex = this.products.findIndex(product => product.id === productId);
         if (productIndex === -1) {
-            throw new Error("Producto no encontrado.");
+            throw Error("Producto no encontrado.");
         }
-        if (updatedFields && updatedFields.code) {
-            const existingProduct = this.products.find(product => product.code === updatedFields.code && product.id !== id);
+        if (updatedFields.code) {
+            const existingProduct = this.products.find(product => product.code === updatedFields.code && product.id !== productId);
             if (existingProduct) {
                 throw new Error("El código de producto ya está en uso.");
             }
@@ -106,19 +101,19 @@ class ProductManager {
             ...updatedFields
         };
 
-        this.saveProducts(this.products);
+        await this.saveProducts(this.products);
 
         return this.products[productIndex];
     }
 
-    deleteProduct(id) {
+    async deleteProduct(id) {
         const initialLength = this.products.length;
         this.products = this.products.filter(product => product.id !== id);
         if (this.products.length === initialLength) {
-            throw new Error("Producto no encontrado.");
+            throw Error("Producto no encontrado.");
         }
 
-        this.saveProducts(this.products);
+        await this.saveProducts(this.products);
     }
 }
 

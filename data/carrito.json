@@ -34,5 +34,18 @@
         "quantity": 3
       }
     ]
+  },
+  {
+    "id": "578a43d5-9453-42bc-b9ab-8c73a680c60a",
+    "products": [
+      {
+        "id": "1",
+        "quantity": 3
+      },
+      {
+        "id": "2",
+        "quantity": 1
+      }
+    ]
   }
 ]
