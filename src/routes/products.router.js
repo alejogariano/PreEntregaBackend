@@ -1,133 +1,70 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const ProductManager = require('../models/ProductManager');
 
 const router = express.Router();
+const productsManager = new ProductManager('data/products.json');
 
-const PRODUCTS_FILE = 'data/products.json';
-router.use(bodyParser.json());
 
-router.get('/', (req, res) => {
-    fs.readFile(PRODUCTS_FILE, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error interno del servidor');
-            return;
-        }
-        const products = JSON.parse(data);
-        const limit = parseInt(req.query.limit) || products.length;
-        res.json(products.slice(0, limit));
-    });
-});
-
-router.get('/:pid', (req, res) => {
-    const productId = req.params.pid;    
-    fs.readFile(PRODUCTS_FILE, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error interno del servidor');
-            return;
-        }
-        const products = JSON.parse(data);
-        const product = products.find(prod => prod.id == productId);
-        
-        if (!product) {
-            res.status(404).send('Producto no encontrado');
-            return;
-        }
-        res.json(product);
-    });
-});
-
-router.post('/', (req, res) => {
-    const { title, description, code, price, stock, category, thumbnails } = req.body;
-    if (!title || !description || !code || !price || !stock || !category || !thumbnails) {
-        return res.status(400).send('Todos los campos son obligatorios');
+router.get('/', async (req, res) => {
+    try {
+        await productsManager.loadProducts();
+        res.json(productsManager.products);
+    } catch (error) {
+        res.status(500).send(error.message);
     }
-
-    const newProduct = {
-        id: uuidv4(),
-        title,
-        description,
-        code,
-        price,
-        stock,
-        category,
-        thumbnails,
-        status: true
-    };
-
-    fs.readFile(PRODUCTS_FILE, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error interno del servidor');
-            return;
-        }
-        let products = JSON.parse(data);
-        products.push(newProduct);
-        fs.writeFile(PRODUCTS_FILE, JSON.stringify(products, null, 2), err => {
-            if (err) {
-                console.error(err);
-                return res.status(500).send('Error interno del servidor');
-            }
-            res.status(201).send('Producto agregado correctamente');
-        });
-    });
 });
 
-router.put('/:pid', (req, res) => {
-    const productId = req.params.pid;
-    const updatedProduct = req.body;
-
-    fs.readFile(PRODUCTS_FILE, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error interno del servidor');
-            return;
-        }
-        const products = JSON.parse(data);
-        const index = products.findIndex(prod => prod.id.toString() === productId);
-        if (index === -1) {
-            res.status(404).send('Producto no encontrado');
-            return;
-        }
-        products[index] = { ...products[index], ...updatedProduct };
-        fs.writeFile(PRODUCTS_FILE, JSON.stringify(products), err => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('Error interno del servidor');
-                return;
-            }
-            res.send('Producto actualizado correctamente');
-        });
-    });
+router.get('/:pid', async (req, res) => {
+    try {
+        const productId = req.params.pid;
+        const product = await productsManager.getProductById(productId);
+        res.json(product);
+    } catch (error) {
+        res.status(404).send(error.message);
+    }
 });
 
-router.delete('/:pid', (req, res) => {
-    const productId = req.params.pid;
-    fs.readFile(PRODUCTS_FILE, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error interno del servidor');
-            return;
+
+router.post('/', async (req, res) => {
+    try {
+        const { title, description, code, price, stock, category, thumbnails } = req.body;
+        if (!title || !description || !code || !price || !stock || !category || !thumbnails) {
+            throw new Error("Todos los campos son obligatorios");
         }
-        let products = JSON.parse(data);
-        const index = products.findIndex(prod => prod.id === productId);
-        if (index === -1) {
-            res.status(404).send('Producto no encontrado');
-            return;
-        }
-        products.splice(index, 1);
-        fs.writeFile(PRODUCTS_FILE, JSON.stringify(products), err => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('Error interno del servidor');
-                return;
-            }
-            res.send('Producto eliminado correctamente');
+        const newProduct = await productsManager.addProduct({
+            title,
+            description,
+            code,
+            price,
+            stock,
+            category,
+            thumbnails
         });
-    });
+        res.status(201).json("Producto agregado correctamente");
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+router.put('/:pid', async (req, res) => {
+    try {
+        const productId = req.params.pid;
+        const updatedFields = req.body;
+        const updatedProduct = await productsManager.updateProduct(productId, updatedFields);
+        res.json(updatedProduct);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+router.delete('/:pid', async (req, res) => {
+    try {
+        const productId = req.params.pid;
+        await productsManager.deleteProduct(productId);
+        res.send('Producto eliminado correctamente');
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
 });
 
 module.exports = router;

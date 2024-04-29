@@ -128,18 +128,5 @@
     "stock": 50,
     "category": "Fútbol",
     "status": true
-  },
-  {
-    "id": "4fdb7f35-95ad-4b1a-9f7e-27437b020dbe",
-    "title": "Camiseta de Defensa y Justicia",
-    "description": "Réplica de la camiseta oficial de Defensa y Justicia.",
-    "code": "DF-001",
-    "price": 99.999,
-    "stock": 100,
-    "category": "Fútbol",
-    "thumbnails": [
-      "defensayjusticia1.jpg"
-    ],
-    "status": true
   }
 ]
