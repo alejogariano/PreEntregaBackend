@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <div class="container-fluid">
+
+        <!-- icono -->
+        <a class="navbar-brand">
+            <img src="https://i.postimg.cc/9fpzFrJ7/FANA.png" width="120px" alt="logo fanaticos de las casacas">
+        </a>
+
+        <!-- boton del menu -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#botonmenu"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- menu colapsable -->
+        <div class="collapse navbar-collapse" id="botonmenu">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/">INICIO</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/products">PRODUCTOS</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/carts">CARRITO</a>
+                </li>
+                {{!-- <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">CARRITO</a>
+                    <ul class="dropdown-menu bg-secondary" aria-labelledby="navbarDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#" id="viewCart">Ver carrito actual</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" id="createCart">Crear uno nuevo</a>
+                        </li>
+                    </ul>
+                </li> --}}
+            </ul>
+
+            <hr class="d-md-none text-white-50">
+
+            <!-- mercadoshops -->
+            <ul class="navbar-nav flex-wrap">
+                <button id="logoutButton">Cerrar sesión 👋</button>
+            </ul>
+        </div>
+    </div>  
+</nav>
+
+<script src="/js/logOut.js"></script>

@@ -1,0 +1,55 @@
+<body>
+    <div id="cart" data-cart-id="{{cart._id}}" class="container mt-5">
+        <h3 class="text-center">Carrito ID: {{cart._id}} del usuario: {{user.username}}</h3>
+        {{#if cart.products}}
+            <div class="row mt-4">
+                <div class="col">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each cart.products}}
+                            <tr>
+                                <td>{{this.product.name}}</td>
+                                <td>{{this.product.description}}</td>
+                                <td>${{this.product.price}}</td>
+                                <td>
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <button type="button" class="btn btn-secondary" onclick="reduceQuantity('{{this.product._id}}')">-</button>
+                                        <button>
+                                            {{this.quantity}}
+                                        </button>
+                                        <button type="button" class="btn btn-secondary" onclick="increaseQuantity('{{this.product._id}}')">+</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <a href="/carts">
+                                            <button type="button" class="btn btn-danger" onclick="removeAll('{{this.product._id}}')">Eliminar todos</button>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-warning" onclick="emptyCart()">Vaciar carrito</button>
+                </div>
+            </div>
+        {{else}}
+            <h2>No tienes productos en tu carrito</h2>
+        {{/if}}
+    </div>
+
+    <script src="/js/cart.js"></script>
