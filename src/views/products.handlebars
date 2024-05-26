@@ -1,22 +1,174 @@
 <body>
-    {{#if messages}}
-        {{#each messages}}
-            <div class="flash-message error">{{ this }}</div>
-        {{/each}}
-    {{/if}}
-    <div class="container">
-        <h2 class="mt-5">Iniciar Sesión</h2>
-        <form action="/login" method="POST">
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo Electrónico</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+    <div class="container mt-5">
+        <h1 class="text-center">Productos</h1>
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <label for="limit" class="form-label">Límite</label>
+                <select id="limit" class="form-select" onchange="fetchProducts()">
+                    <option value="3">3</option>
+                    <option value="6">6</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+            <div class="col-md-2">
+                <label for="sort" class="form-label">Ordenar por precio</label>
+                <select id="sort" class="form-select" onchange="fetchProducts()">
+                    <option value="">Ninguno</option>
+                    <option value="asc">De menor a mayor</option>
+                    <option value="desc">De mayor a menor</option>
+                </select>
             </div>
-            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-        </form>
-        <p class="mt-3">¿No tienes una cuenta? <a href="/register">Regístrate</a></p>
+            <div class="col-md-3">
+                <label for="category" class="form-label">Categoría</label>
+                <div id="category" class="form-switch">
+                    <!-- Categorías se llenarán dinámicamente con switches -->
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="query" class="form-label">¿Qué estás buscando?</label>
+                <input type="text" id="query" class="form-control" oninput="fetchProducts()">
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-md-12 text-center">
+                <a href="/products">
+                    Limpiar filtros
+                </a>
+            </div>
+        </div>
+        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul id="pagination" class="pagination justify-content-center"></ul>
+        </nav>
+
+        <div id="products" class="row mt-4">
+            {{#if products}}
+                {{#each products}}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{_id}}</h5>
+                            <h5 class="card-title">{{name}}</h5>
+                            <p class="card-text">{{description}}</p>
+                            <p class="card-text"><strong>Precio:</strong> {{price}}</p>
+                            <p class="card-text"><strong>Categoría:</strong> {{category}}</p>
+                            <p class="card-text"><strong>Disponibilidad:</strong> {{#if availability}}Disponible{{else}}No disponible{{/if}}</p>
+                            <button class="agregar-carrito" data-product-id="{{_id}}">Agregar al carrito</button>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            {{else}}
+                <p>No se encontraron productos.</p>
+            {{/if}}
+        </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadCategories();
+            fetchProducts();
+        });
+
+        async function loadCategories() {
+            const response = await fetch('/api/products/categories');
+            const data = await response.json();
+            const categoryDiv = document.getElementById('category');
+
+            if (data.status === 'success') {
+                categoryDiv.innerHTML = data.categories.map(category => `
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="category-${category}" value="${category}" onchange="fetchProducts()">
+                        <label class="form-check-label" for="category-${category}">${category}</label>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function fetchProducts(page = 1) {
+            const limit = document.getElementById('limit').value;
+            const sort = document.getElementById('sort').value;
+            const query = document.getElementById('query').value;
+            const categories = Array.from(document.querySelectorAll('.form-check-input:checked')).map(input => input.value);
+
+            let url = `/api/products?limit=${limit}&page=${page}`;
+            if (sort) url += `&sort=${sort}`;
+            if (query) url += `&query=${query}`;
+            if (categories.length > 0) url += `&categories=${categories.join(',')}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    const productsDiv = document.getElementById('products');
+                    const paginationDiv = document.getElementById('pagination');
+                    const errorMessageDiv = document.getElementById('error-message');
+
+                    errorMessageDiv.style.display = 'none';
+                    productsDiv.innerHTML = data.payload.map(product => `
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product._id}</h5>
+                                    <h5 class="card-title">${product.name}</h5>
+                                    <p class="card-text">${product.description}</p>
+                                    <p class="card-text"><strong>Precio:</strong> ${product.price}</p>
+                                    <p class="card-text"><strong>Categoría:</strong> ${product.category}</p>
+                                    <p class="card-text"><strong>Disponibilidad:</strong> ${product.availability ? 'Disponible' : 'No disponible'}</p>
+                                    <button class="agregar-carrito" data-product-id="${product._id}">Agregar al carrito</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    paginationDiv.innerHTML = `
+                        ${data.hasPrevPage ? `<li class="page-item"><a class="page-link" href="#" onclick="fetchProducts(${data.prevPage})">Anterior</a></li>` : ''}
+                        <li class="page-item disabled"><a class="page-link" href="#">Página ${data.page} de ${data.totalPages}</a></li>
+                        ${data.hasNextPage ? `<li class="page-item"><a class="page-link" href="#" onclick="fetchProducts(${data.nextPage})">Siguiente</a></li>` : ''}
+                    `;
+
+                    // Asignar event listeners a los botones de agregar al carrito
+                    assignAddToCartListeners();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                const errorMessageDiv = document.getElementById('error-message');
+                errorMessageDiv.textContent = error.message;
+                errorMessageDiv.style.display = 'block';
+                document.getElementById('products').innerHTML = '';
+                document.getElementById('pagination').innerHTML = '';
+            }
+        }
+
+        function assignAddToCartListeners() {
+            document.querySelectorAll('.agregar-carrito').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const productId = button.getAttribute('data-product-id');
+                    const cartId = '{{cartId}}';
+
+                    try {
+                        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ productId })
+                        });
+                        const data = await response.json();
+
+                        if (data.status === 'success') {
+                            Swal.fire('¡Éxito!', 'Producto agregado al carrito.', 'success');
+                        } else {
+                            Swal.fire('Error', 'No se pudo agregar el producto al carrito.', 'error');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'Ocurrió un error al agregar el producto al carrito.', 'error');
+                    }
+                });
+            });
+        }
+    </script>
 </body>
