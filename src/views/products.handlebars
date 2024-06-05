@@ -103,9 +103,9 @@
                     productsDiv.innerHTML = data.payload.map(product => `
                         <div class="col-md-4 mb-4">
                             <div class="card">
-                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" style="height: 150px" alt="${product.description}">
+                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" style="height: 250px" alt="${product.description}">
                                 <div class="card-body">
-                                    <h5 class="card-title">${product.name}</h5>
+                                    <h5 class="card-title">${product.title}</h5>
                                     <p class="card-text">${product.description}</p>
                                     <p class="card-text"><strong>Precio:</strong> ${product.price}</p>
                                     <p class="card-text"><strong>Categoría:</strong> ${product.category}</p>
