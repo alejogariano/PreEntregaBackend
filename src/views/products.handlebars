@@ -2,72 +2,107 @@
     {{#if user}}
         <h3 class="text-center">Bienvenido, 
             <strong>
-                {{user.username}}
+                {{user.first_name}}
             </strong>
         </h3>
-    {{else}}
-        <p>
-            Inicia sesión para poder comprar!
-            <a href="/login" class="btn btn-info">Iniciar</a>
-        </p>
     {{/if}}
-    <div class="container mt-5">
-        <h1 class="text-center">Productos</h1>
+    <div class="container mt-5" style="width: 1000px;">
         <div class="row mb-4">
-            <div class="col-md-2">
-                <label for="limit" class="form-label">Límite</label>
-                <select id="limit" class="form-select" onchange="fetchProducts()">
-                    <option value="3">3</option>
-                    <option value="6">6</option>
-                    <option value="10" selected>10</option>
-                    <option value="20">20</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="sort" class="form-label">Ordenar por precio</label>
-                <select id="sort" class="form-select" onchange="fetchProducts()">
-                    <option value="">Ninguno</option>
-                    <option value="asc">De menor a mayor</option>
-                    <option value="desc">De mayor a menor</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label for="category" class="form-label">Categoría</label>
-                <div id="category" class="form-switch">
-                    <!-- Categorías se llenarán dinámicamente con switches -->
+            <div id="fixed-filters" class="fixed-filters col-md-3">
+                <div class="mb-3">
+                    <label for="query" class="form-label">¿Qué estás buscando?</label>
+                    <input type="text" id="query" class="form-control" oninput="fetchProducts()">
+                </div>
+                <br>
+                <div class="mb-3">
+                    <label for="sort" class="form-label">Ordenar por precio</label>
+                    <select id="sort" class="form-select" onchange="fetchProducts()">
+                        <option value="">Ninguno</option>
+                        <option value="asc">De menor a mayor</option>
+                        <option value="desc">De mayor a menor</option>
+                    </select>
+                </div>
+                <br>
+                <div class="mb-3">
+                    <label for="limit" class="form-label">Límite</label>
+                    <select id="limit" class="form-select" onchange="fetchProducts()">
+                        <option value="3">3</option>
+                        <option value="6">6</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div id="category" class="mb-3">
+                    <label for="categoryFilter" class="form-label">Categoría</label>
+                    <div id="categoryFilter"></div>
+                </div>
+                <div>
+                    <a href="/products">Limpiar filtros</a>
                 </div>
             </div>
-            <div class="col-md-3">
-                <label for="query" class="form-label">¿Qué estás buscando?</label>
-                <input type="text" id="query" class="form-control" oninput="fetchProducts()">
-            </div>
-        </div>
-        <div class="row mb-4">
-            <div class="col-md-12 text-center">
-                <a href="/products">
-                    Limpiar filtros
-                </a>
-            </div>
-        </div>
-        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul id="pagination" class="pagination justify-content-center"></ul>
-        </nav>
 
-        <div id="products" class="row mt-4">
+            <div class="col-md-9">
+                <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+                <nav aria-label="Page navigation">
+                    <ul id="pagination" class="pagination justify-content-center"></ul>
+                </nav>
+                <div id="products" class="row mt-4">
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul id="pagination" class="pagination justify-content-center"></ul>
+                </nav>
+            </div>
         </div>
     </div>
+
+    <style>
+        .fixed-filters {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 992px) {
+            .fixed-filters {
+                position: relative;
+                top: initial;
+                max-height: initial;
+                overflow-y: initial;
+                background-color: initial;
+                padding: initial;
+                box-shadow: initial;
+                border-radius: initial;
+            }
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             await loadCategories()
             fetchProducts()
+
+            const fixedFilters = document.getElementById('fixed-filters')
+            const mainContent = document.querySelector('.col-md-9')
+
+            const adjustFiltersPosition = () => {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+                const topPosition = mainContent.offsetTop - scrollTop
+                fixedFilters.style.top = `${Math.max(topPosition, 20)}px`
+            }
+
+            window.addEventListener('scroll', adjustFiltersPosition)
+            window.addEventListener('resize', adjustFiltersPosition)
         })
 
         async function loadCategories() {
             const response = await fetch('/api/products/categories')
             const data = await response.json()
-            const categoryDiv = document.getElementById('category')
+            const categoryDiv = document.getElementById('categoryFilter')
 
             if (data.status === 'success') {
                 categoryDiv.innerHTML = data.categories.map(category => `
@@ -103,16 +138,16 @@
                     productsDiv.innerHTML = data.payload.map(product => `
                         <div class="col-md-4 mb-4">
                             <div class="card">
-                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" style="height: 250px" alt="${product.description}">
+                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" style="height: 150px" alt="${product.description}"><a href="/products/${product._id}" class="btn btn-outline-info">Ver Detalle</a></img>
                                 <div class="card-body">
-                                    <h5 class="card-title">${product.title}</h5>
+                                    <h5 class="card-title">${product.name}</h5>
                                     <p class="card-text">${product.description}</p>
-                                    <p class="card-text"><strong>Precio:</strong> ${product.price}</p>
-                                    <p class="card-text"><strong>Categoría:</strong> ${product.category}</p>
+                                    <p class="card-text"><strong>Precio:</strong> $${product.price}</p>
                                     <p class="card-text"><strong>Stock:</strong> ${product.stock}</p>
-                                    <p class="card-text"><strong>Disponibilidad:</strong> ${product.availability ? 'Disponible' : 'No disponible'}</p>
                                     <button class="add-cart btn btn-success" data-product-id="${product._id}" data-product-stock="${product.stock}">Agregar al carrito</button>
-                                    <a href="/products/${product._id}" class="btn btn-info">Ver Detalle</a>
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">Updated ${product.updatedAt}</small>
                                 </div>
                             </div>
                         </div>
@@ -142,6 +177,7 @@
                 button.addEventListener('click', async (event) => {
                     const productId = button.getAttribute('data-product-id')
                     const cartId = '{{cartId}}'
+                    console.log(cartId)
                     const productStock = button.getAttribute('data-product-stock')
 
                     try {
@@ -188,7 +224,7 @@
                                     cancelButtonText: 'Continuar comprando'
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        window.location.href = `/carts/${cartId}`;
+                                        window.location.href = `/carts/${cartId}`
                                     }
                                 })
                             } else {

@@ -1,73 +1,60 @@
-// Función para obtener el cartId del atributo data-cart-id
 function getCartId() {
-    const cartDiv = document.getElementById('cart');
-    return cartDiv.dataset.cartId;
+    const cartDiv = document.getElementById('cart')
+    return cartDiv.dataset.cartId
 }
 
-// Función para reducir la cantidad de un producto en el carrito
-async function reduceQuantity(productId) {
-    const cartId = getCartId();
+async function removeFromCart(productId) {
+    const cartId = getCartId()
     try {
-        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'PUT', body: JSON.stringify({ quantity: -1 }) });
-        const data = await response.json();
-        if (data.status === 'success') {
-            alert('Cantidad reducida');
-            fetchCart();
-        } else {
-            alert('Error al reducir cantidad');
+        const swalResponse = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Quieres eliminar este producto del carrito?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+        })
+
+        if (swalResponse.isConfirmed) {
+            const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'DELETE' })
+            const data = await response.json()
+            if (data.status === 'success') {
+                await Swal.fire('¡Éxito!', 'Producto eliminado del carrito', 'success')
+                window.location.href = `/carts/${cartId}`
+            } else {
+                await Swal.fire('Error', 'No se pudo eliminar el producto del carrito', 'error')
+            }
         }
     } catch (error) {
-        console.error('Error al reducir cantidad:', error);
+        console.error('Error al eliminar producto del carrito:', error)
+        await Swal.fire('Error', 'Ocurrió un error al eliminar el producto del carrito', 'error')
     }
 }
 
-// Función para incrementar la cantidad de un producto en el carrito
-async function increaseQuantity(productId) {
-    const cartId = getCartId();
-    try {
-        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'PUT', body: JSON.stringify({ quantity: 1 }) });
-        const data = await response.json();
-        if (data.status === 'success') {
-            alert('Cantidad incrementada');
-            fetchCart();
-        } else {
-            alert('Error al incrementar cantidad');
-        }
-    } catch (error) {
-        console.error('Error al incrementar cantidad:', error);
-    }
-}
-
-// Función para eliminar todos los productos con el mismo ID del carrito
-async function removeAll(productId) {
-    const cartId = getCartId();
-    try {
-        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, { method: 'DELETE' });
-        const data = await response.json();
-        if (data.status === 'success') {
-            alert('Productos eliminados');
-            fetchCart();
-        } else {
-            alert('Error al eliminar productos');
-        }
-    } catch (error) {
-        console.error('Error al eliminar productos:', error);
-    }
-}
-
-// Función para vaciar el carrito por completo
 async function emptyCart() {
-    const cartId = getCartId();
+    const cartId = getCartId()
     try {
-        const response = await fetch(`/api/carts/${cartId}`, { method: 'DELETE' });
-        const data = await response.json();
-        if (data.status === 'success') {
-            alert('Carrito vaciado');
-            fetchCart();
-        } else {
-            alert('Error al vaciar carrito');
+        const swalResponse = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Quieres vaciar completamente el carrito?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, vaciar',
+            cancelButtonText: 'Cancelar',
+        })
+
+        if (swalResponse.isConfirmed) {
+            const response = await fetch(`/api/carts/${cartId}`, { method: 'DELETE' })
+            const data = await response.json()
+            if (data.status === 'success') {
+                await Swal.fire('¡Éxito!', 'Carrito vaciado', 'success')
+                window.location.href = `/carts/${cartId}`
+            } else {
+                await Swal.fire('Error', 'No se pudo vaciar el carrito', 'error')
+            }
         }
     } catch (error) {
-        console.error('Error al vaciar carrito:', error);
+        console.error('Error al vaciar carrito:', error)
+        await Swal.fire('Error', 'Ocurrió un error al vaciar el carrito', 'error')
     }
 }

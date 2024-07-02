@@ -4,23 +4,53 @@
             <div class="flash-message error">{{ this }}</div>
         {{/each}}
     {{/if}}
-    <div class="container">
+    <div class="container" style="width:500px">
         <h2 class="mt-5">Registro</h2>
-        <form action="/register" method="POST">
-            <div class="mb-3">
-                <label for="username" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+        <p>¿Ya tienes una cuenta? <a href="/login">Inicia Sesión</a></p>
+        <form action="/register" method="POST" onsubmit="return validatePasswords()">
+            <div class="mb-1">
+                <label for="first_name" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo Electrónico</label>
+            <div class="mb-1">
+                <label for="last_name" class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+            <div class="mb-1">
+                <label for="email" class="form-label">Correo electrónico</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
-            <div class="mb-3">
+            <div class="mb-1">
                 <label for="password" class="form-label">Contraseña</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
+            <div class="mb-1">
+                <label for="password2" class="form-label">Ingrese nuevamente la contraseña</label>
+                <input type="password" class="form-control" id="password2" name="password2" required>
+            </div>
             <button type="submit" class="btn btn-primary">Registrarse</button>
         </form>
-        <p class="mt-3">¿Ya tienes una cuenta? <a href="/login">Inicia Sesión</a></p>
     </div>
+    <script>
+        function validatePasswords() {
+            const password = document.getElementById('password').value
+            const password2 = document.getElementById('password2').value
+
+            if (password !== password2) {
+                Swal.fire('Error', 'Las contraseñas no coinciden.', 'error')
+                return false
+            }
+            return true
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search)
+            if (urlParams.has('success')) {
+                Swal.fire('¡Éxito!', urlParams.get('success'), 'success')
+            }
+            if (urlParams.has('error')) {
+                Swal.fire('Error', urlParams.get('error'), 'error')
+            }
+        })
+    </script>
 </body>

@@ -2,18 +2,25 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
 
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    userCarts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Cart' }],
-})
+    email: { type: String, unique: true },
+    password: String,
+    first_name: String,
+    last_name: String,
+    profile_image: { type: String, default: '/uploads/default.jpg' },
+    age: Number,
+    cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
+    role: { type: String, default: 'user' },
+    messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
+    ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Rating' }],
+    notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }]
+}, { timestamps: true })
 
 userSchema.pre('save', async function (next) {
-    const user = this;
-    if (user.isModified('password')) {
-        user.password = await bcrypt.hash(user.password, 10);
+    const user = this
+    if (user.isModified('password') && user.password) {
+        user.password = await bcrypt.hash(user.password, 10)
     }
-    next();
+    next()
 })
 
 userSchema.methods.comparePassword = async function (candidatePassword) {

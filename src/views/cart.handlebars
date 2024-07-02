@@ -1,12 +1,25 @@
 <body>
+    {{#if user}}
+        <h3 class="text-center">Bienvenido, 
+            <strong>
+                {{user.first_name}}
+            </strong>
+        </h3>
+    {{else}}
+        <p>
+            Inicia sesión para poder comprar!
+            <a href="/login" class="btn btn-info">Iniciar</a>
+        </p>
+    {{/if}}
     <div id="cart" data-cart-id="{{cart._id}}" class="container mt-5">
-        <h3 class="text-center">Carrito ID: {{cart._id}} del usuario: {{user.username}}</h3>
-        {{#if cart.products}}
-            <div class="row mt-4">
+        <h3 class="text-center">Carrito ID: {{cart._id}}</h3>
+        {{#if cart.products.length}}
+            <div class="row mt-4" style="width: 1000px;">
                 <div class="col">
                     <table class="table">
                         <thead>
                             <tr>
+                                <th scope="col"></th>
                                 <th scope="col">Producto</th>
                                 <th scope="col">Descripción</th>
                                 <th scope="col">Precio</th>
@@ -17,24 +30,22 @@
                         <tbody>
                             {{#each cart.products}}
                             <tr>
+                                <td>
+                                    <a href="/products/{{product._id}}">
+                                        <img class="cartImage" src="{{this.product.thumbnail}}" alt="{{this.product.description}}">
+                                    </a>
+                                    
+                                </td>
                                 <td>{{this.product.name}}</td>
                                 <td>{{this.product.description}}</td>
                                 <td>${{this.product.price}}</td>
                                 <td>
                                     <div class="btn-group" role="group" aria-label="Basic example">
-                                        <button type="button" class="btn btn-secondary" onclick="reduceQuantity('{{this.product._id}}')">-</button>
-                                        <button>
-                                            {{this.quantity}}
-                                        </button>
-                                        <button type="button" class="btn btn-secondary" onclick="increaseQuantity('{{this.product._id}}')">+</button>
+                                        <span class="mx-2">{{this.quantity}}</span>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="btn-group" role="group" aria-label="Basic example">
-                                        <a href="/carts">
-                                            <button type="button" class="btn btn-danger" onclick="removeAll('{{this.product._id}}')">Eliminar todos</button>
-                                        </a>
-                                    </div>
+                                    <button type="button" class="btn" onclick="removeFromCart('{{this.product._id}}')"><i class="fa-solid fa-trash-can fa-lg" style="color: #ff0000;"></i></button>
                                 </td>
                             </tr>
                             {{/each}}
@@ -42,14 +53,21 @@
                     </table>
                 </div>
             </div>
-            <div class="row">
-                <div class="col">
-                    <button class="btn btn-warning" onclick="emptyCart()">Vaciar carrito</button>
+            <div class="text-center" style= "justify-content: center; display:flex">
+                <div class="col text-end">
+                    <a class="btn btn-info" href="/products">Seguir Comprando...</a>
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-danger" onclick="emptyCart()">Vaciar carrito</button>
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-success" onclick="#">Finalizar Compra (no hace nada)</button>
                 </div>
             </div>
         {{else}}
-            <h2>No tienes productos en tu carrito</h2>
+            <h2 class="text-center mt-4">No tienes productos en tu carrito 😓</h2>
         {{/if}}
     </div>
 
     <script src="/js/cart.js"></script>
+</body>

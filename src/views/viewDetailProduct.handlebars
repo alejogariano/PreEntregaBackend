@@ -1,0 +1,87 @@
+<body>
+    {{#if user}}
+        <h3 class="text-center">Bienvenido, 
+            <strong>
+                {{user.first_name}}
+            </strong>
+        </h3>
+    {{else}}
+        <p>
+            Inicia sesión para poder comprar!
+            <a href="/login" class="btn btn-info">Iniciar</a>
+        </p>
+    {{/if}}
+    <div class="container mt-5">
+        <h1 class="text-center">{{product.name}}</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{product.thumbnail}}" class="img-fluid" alt="{{product.description}}">
+            </div>
+            <div class="col-md-6">
+                <p><strong>ID:</strong> {{product._id}}</p>
+                <p><strong>Nombre:</strong> {{product.name}}</p>
+                <p><strong>Descripción:</strong> {{product.description}}</p>
+                <p><strong>Precio:</strong> {{product.price}}</p>
+                <p><strong>Categoría:</strong> {{product.category}}</p>
+                <p><strong>Stock:</strong> {{product.stock}}</p>
+                <button class="btn btn-success add-cart" data-product-id="{{product._id}}" data-product-stock="{{product.stock}}">Agregar al carrito</button>
+                <a class="btn btn-info" href="/products">Seguir comprando...</a>
+                <a class="btn btn-info" href="/carts/{{user.cart._id}}">Ir al carrito</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.add-cart').addEventListener('click', async (event) => {
+                const productId = event.target.getAttribute('data-product-id')
+                const cartId = '{{cartId}}'
+                const productStock = event.target.getAttribute('data-product-stock')
+
+                try {
+                    const { value: quantity } = await Swal.fire({
+                        title: 'Selecciona la cantidad',
+                        input: 'number',
+                        inputLabel: 'Cantidad:',
+                        inputPlaceholder: 'Ingrese la cantidad',
+                        inputAttributes: {
+                            min: 1,
+                            max: 50,
+                            step: 1
+                        },
+                        showCancelButton: true,
+                        confirmButtonText: 'Agregar al carrito',
+                        cancelButtonText: 'Cancelar',
+                        allowOutsideClick: false,
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return 'Debes ingresar una cantidad'
+                            } else if (value > 50) {
+                                return `Solo puedes agregar hasta ${productStock} unidades`
+                            }
+                        }
+                    })
+
+                    if (quantity) {
+                        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ productId, quantity })
+                        })
+                        const data = await response.json()
+
+                        if (data.status === 'success') {
+                            Swal.fire('¡Éxito!', 'Producto agregado al carrito.', 'success')
+                        } else {
+                            Swal.fire('Error', 'No se pudo agregar el producto al carrito.', 'error')
+                        }
+                    }
+                } catch (error) {
+                    Swal.fire('Error', 'Ocurrió un error al agregar el producto al carrito.', 'error')
+                }
+            })
+        })
+    </script>
+</body>
