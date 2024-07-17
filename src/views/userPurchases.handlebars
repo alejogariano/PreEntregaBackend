@@ -1,0 +1,57 @@
+<body>
+    {{#if user}}
+        <h3 class="text-center">Bienvenido, 
+            <strong>{{user.first_name}}</strong>
+        </h3>
+        <div class="container mt-5">
+            <h3 class="text-center">Tus Compras</h3>
+            {{#if purchases.length}}
+                <div class="accordion" id="accordionPurchases">
+                    {{#each purchases}}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{@index}}">
+                                <button class="btn btn-outline-dark accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{@index}}" aria-expanded="false" aria-controls="collapse{{@index}}">
+                                    <small><p>Fecha: {{this.createdAt}}</p></small>
+                                    Código: <strong>{{this.code}}</strong>
+                                </button>
+                            </h2>
+                            <div id="collapse{{@index}}" class="accordion-collapse collapse" aria-labelledby="heading{{@index}}">
+                                <div class="accordion-body">
+                                    <h5>Monto: <strong>${{this.amount}}</strong></h5>
+                                    <ul class="list-group">
+                                        {{#each this.products}}
+                                            <li class="list-group-item">
+                                                <div style="display: flex; align-items:center; justify-content:space-between">
+                                                    <div>
+                                                            <p><strong>Producto:</strong> {{this.product.name}}</p>
+                                                            <p><strong>ID:</strong> {{this.product._id}}</p>
+                                                            <p><strong>Cantidad:</strong> {{this.quantity}}</p>
+                                                    </div>
+                                                    <div class="text-center">
+                                                        <img src="{{this.product.thumbnail}}" alt="" style="width: 100px; display:flex">
+                                                        <a href="/products/{{this.product._id}}">Ver detalle</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {{/each}}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+            {{else}}
+                <h4 class="text-center mt-4">No tienes compras realizadas.</h4>
+            {{/if}}
+        </div>
+    {{else}}
+        <p>
+            Inicia sesión para ver tus compras.
+            <a href="/login" class="btn btn-info">Iniciar</a>
+        </p>
+    {{/if}}
+
+    {{!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> --}}
+</body>

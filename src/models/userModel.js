@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Cart' },
     role: { type: String, default: 'user' },
     messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
+    purchases: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
     ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Rating' }],
     notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }]
 }, { timestamps: true })

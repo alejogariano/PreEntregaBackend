@@ -1,5 +1,12 @@
 import express from 'express'
-import { registerUserHandler, loginUserHandler, githubAuth, githubCallback, googleAuth, googleCallback } from '../controllers/authController.js'
+import {
+    registerUserHandler,
+    loginUserHandler,
+    githubAuth,
+    githubCallback,
+    googleAuth,
+    googleCallback
+} from '../../controllers/authController.js'
 
 const router = express.Router()
 

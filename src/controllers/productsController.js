@@ -1,7 +1,7 @@
 import {
     getProducts as getProductsService,
     getCategories as getCategoriesService
-} from '../services/productService.js'
+} from '../services/productsService.js'
 
 export const getProducts = async (req, res) => {
     try {

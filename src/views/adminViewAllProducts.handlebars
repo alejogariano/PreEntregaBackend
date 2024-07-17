@@ -1,0 +1,73 @@
+<div class="container mt-5">
+    <div class="container">
+        <div class="row align-items-start">
+            <div class="col">
+                <h1>Lista de productos</h1>
+            </div>
+            <div class="col">
+                <a href="/adminAddProduct" class="btn btn-info">
+                    Agregar un producto...
+                </a>
+            </div>
+        </div>
+    </div>
+    {{#if products.length}}
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}}
+                    <tr>
+                        <td><img src="{{this.thumbnail}}" alt="{{this.title}} thumbnail" class="img-fluid" style="width: 100px;"></td>
+                        <td>{{this._id}}</td>
+                        <td>{{this.name}}</td>
+                        <td>${{this.price}}</td>
+                        <td>
+                            <a href="/adminUpdateProduct/{{this._id}}" class="btn btn-info">✏</a>
+                        </td>
+                        <td>
+                            <a href="/adminDeleteProduct/{{_id}}" class="btn btn-info" id="deleteProductBtn">❌</a>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    {{else}}
+        <p>No hay productos disponibles! 😥</p>
+    {{/if}}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteBtns = document.querySelectorAll('#deleteProductBtn')
+        
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', function (event) {
+                event.preventDefault()
+                
+                const deleteUrl = this.getAttribute('href')
+                
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: '¿Quieres borrar este producto?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, borrar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = deleteUrl
+                    }
+                })
+            })
+        })
+    })
+</script>

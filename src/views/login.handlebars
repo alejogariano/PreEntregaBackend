@@ -28,15 +28,16 @@
         </form>
         <br>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search)
-            if (urlParams.has('success')) {
-                Swal.fire('¡Éxito!', urlParams.get('success'), 'success')
-            }
-            if (urlParams.has('error')) {
-                Swal.fire('Error', urlParams.get('error'), 'error')
-            }
-        })
-    </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search)
+                if (urlParams.has('success')) {
+                    Swal.fire('¡Éxito!', urlParams.get('success'), 'success')
+                }
+                if (urlParams.has('error')) {
+                    Swal.fire('Error', urlParams.get('error'), 'error')
+                }
+            })
+        </script>
+    </div>
 </body>

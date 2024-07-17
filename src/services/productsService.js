@@ -1,4 +1,4 @@
-import { findProducts, findCategories } from '../dao/productData.js'
+import productRepository from '../repositories/productRepository.js'
 
 export const getProducts = async (query) => {
     const { limit = 10, page = 1, sort, query: searchQuery, categories } = query
@@ -20,7 +20,7 @@ export const getProducts = async (query) => {
         throw new Error('Número de página o límite inválido')
     }
 
-    const products = await findProducts(filter, options)
+    const products = await productRepository.getPaginatedProducts(filter, options)
 
     if (options.page > products.totalPages) {
         throw new Error('Página no encontrada')
@@ -29,6 +29,10 @@ export const getProducts = async (query) => {
     return products
 }
 
+export const getAllProducts = async () => {
+    return await productRepository.getAllProducts()
+}
+
 export const getCategories = async () => {
-    return await findCategories()
+    return await productRepository.getDistinctCategories()
 }

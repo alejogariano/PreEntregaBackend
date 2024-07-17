@@ -1,0 +1,146 @@
+<div class="container">
+    <h3>Bienvenido, <strong>{{user.first_name}}</strong></h3>
+    {{#if (equals user.role "user")}}
+        <h1 class="mt-4">Chat</h1>
+        <h5>Dejanos tu mensaje o inquietud, un administrador se contactará contigo lo antes posible!</h5>
+        <br>
+        <form action="/api/chat" method="POST">
+            <div class="form-group">
+                <input type="text" class="form-control" name="content" placeholder="Mensaje" required>
+            </div>
+            <button type="submit" class="btn btn-success">
+                Enviar
+            </button>
+            <hr>
+        </form>
+    {{/if}}
+    <div>
+        {{#each messages}}
+            <div class="message border rounded p-3 mb-3" style="background-color: antiquewhite;">
+                <div style="display: flex; gap: 20px">
+                    <div>
+                        <img style="width: 50px;" src="{{user.profile_image}}" alt="">
+                    </div>
+                    <div>
+                        <h5>
+                            <strong>{{user.first_name}}:</strong>
+                            <br>
+                            <small>({{user.email}})</small>
+                        </h5>
+                    </div>
+                </div>
+                <p class="content">📌  <strong>{{content}}</strong></p>
+                <small>({{timestamp}})</small>
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                        <div class="accordion-header d-md-flex justify-content-md-end" style="gap: 15px;" id="headingOne">
+                            <button class="btn btn-secondary commentMessage" data-id="{{_id}}">Comentar</button>
+                            {{#if (equals user._id ../user._id)}}
+                                <button class="accordion-button collapsed btn btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Acciones 🔽
+                                </button>
+                            </div>
+                            <br>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body d-md-flex justify-content-md-end" id="currentUserDetails" style="gap: 10px;">
+                                        <button class="btn btn-primary edit" data-id="{{_id}}" data-content="{{content}}">Editar</button>
+                                        <a href="/api/chat/delete/{{_id}}" class="btn btn-danger">Eliminar</a>
+                                </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+                <div class="comments">
+                    {{#each comments}}
+                        <hr>
+                        <div class="comment" style="display: flex; justify-content:flex-end; gap: 20px; margin-left: 50px; margin-right: 50px">
+                            <div>
+                                <div style="display: flex; justify-content:flex-end;">
+                                    {{#if (equals user.role "user")}}
+                                        <h6><strong>{{user.email}} comentó:</strong></h6>
+                                    {{else}}
+                                        <h6><strong>Administrador:</strong></h6>
+                                    {{/if}}
+                                </div>
+                                <p>{{content}}</p>
+                            </div>
+                            <div>
+                                <img style="width: 50px;" src="{{user.profile_image}}" alt="">
+                            </div>
+                        </div>
+                        <hr>
+                    {{/each}}
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>
+
+<div id="edit-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Mensaje</h5>
+                <button type="button" class="btn btn-outline-danger btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form" action="" method="POST">
+                    <div class="mb-3">
+                        <textarea id="edit-message-input" class="form-control" name="content"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Finalizar edición</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="comment-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Comentario</h5>
+                <button type="button" class="btn btn-outline-danger btn-close" data-bs-dismiss="modal" aria-label="Close">❌</button>
+            </div>
+            <div class="modal-body">
+                <form id="comment-form" action="" method="POST">
+                    <div class="mb-3">
+                        <textarea id="comment-input" class="form-control" name="content"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar comentario</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const editModal = new bootstrap.Modal(document.getElementById('edit-modal'))
+    const commentModal = new bootstrap.Modal(document.getElementById('comment-modal'))
+
+    const editForm = document.getElementById('edit-form')
+    const editMessageInput = document.getElementById('edit-message-input')
+
+    const commentForm = document.getElementById('comment-form')
+    const commentInput = document.getElementById('comment-input')
+
+    document.querySelectorAll('.edit').forEach(button => {
+        button.addEventListener('click', () => {
+            const messageId = button.getAttribute('data-id')
+            const content = button.getAttribute('data-content')
+            editMessageInput.value = content
+            editForm.action = `/api/chat/edit/${messageId}`
+            editModal.show()
+        })
+    })
+
+    document.querySelectorAll('.commentMessage').forEach(button => {
+        button.addEventListener('click', () => {
+            const messageId = button.getAttribute('data-id')
+            commentForm.action = `/api/chat/comment/${messageId}`
+            commentModal.show()
+        })
+    })
+})
+</script>

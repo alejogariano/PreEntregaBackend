@@ -1,0 +1,56 @@
+{{#if user}}
+        {{#if (equals user.role "user")}}
+            <h3 class="text-center">Bienvenido, 
+                <strong>
+                    {{user.first_name}}
+                </strong>
+            </h3>
+        {{else}}
+            <h3>
+                Bienvenido, Administrador:
+            </h3>
+            <h3>
+                <strong>{{user.first_name}}</strong>
+            </h3>
+        {{/if}}
+    {{else}}
+        <p>
+            Inicia sesión para poder comprar!
+            <a href="/login" class="btn btn-info">Iniciar</a>
+        </p>
+    {{/if}}
+    
+<div class="container mt-5">
+    <div class="container">
+        <li>
+            <a href="/adminViewAllProducts" class="btn btn-outline-dark" style="margin: 20px;">
+                👉 Ver/editar/eliminar productos
+            </a>
+        </li>
+        <li>
+            <a href="/adminAddProduct" class="btn btn-outline-dark" style="margin: 20px;">
+                👉 Agregar un producto
+            </a>
+        </li>
+        <li>
+            <a href="/adminViewAllUsers" class="btn btn-outline-dark" style="margin: 20px;">
+                👉 Ver/editar/eliminar usuarios
+            </a>
+        </li>
+        <li>
+            <a href="/chat" class="btn btn-outline-dark" style="margin: 20px;">
+                👉 Responder/moderar mensajes
+            </a>
+        </li>
+        <li>
+            <a href="/adminPurchases" class="btn btn-outline-dark" style="margin: 20px;">
+                👉 Ver compras
+            </a>
+        </li>
+        <li>
+            <a href="#" class="btn btn-outline-dark" style="margin: 20px;">
+                👉 Otro por las dudas
+            </a>
+        </li>
+    </div>
+</div>

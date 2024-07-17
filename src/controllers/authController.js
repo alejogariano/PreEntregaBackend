@@ -29,7 +29,11 @@ export const loginUserHandler = (req, res, next) => {
             if (err) {
                 return next(err)
             }
-            return res.redirect('/products')
+            if (user.role === 'admin') {
+                return res.redirect('/adminDashboard')
+            } else {
+                return res.redirect('/products?success=' + encodeURIComponent('Bienvenido, ' + user.first_name))
+            }
         })
     })(req, res, next)
 }

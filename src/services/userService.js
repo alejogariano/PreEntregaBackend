@@ -1,11 +1,11 @@
-import {  findUserById, updateUser, deleteUserById, deleteCartById, findUserByEmail, createUser, createSuperadmin, createAdmin } from '../dao/userData.js'
+import userRepository from '../repositories/userRepository.js'
 import Cart from '../models/cartModel.js'
 
 export const updateProfile = async (userId, profileData, file) => {
     const { first_name, last_name, age } = profileData
 
     try {
-        const user = await findUserById(userId)
+        const user = await userRepository.getUserById(userId)
 
         if (!user) {
             throw new Error('Usuario no encontrado')
@@ -19,7 +19,7 @@ export const updateProfile = async (userId, profileData, file) => {
             user.profile_image = `/uploads/${file.filename}`
         }
 
-        await updateUser(user)
+        await userRepository.updateUser(user)
 
         return user
     } catch (error) {
@@ -29,14 +29,14 @@ export const updateProfile = async (userId, profileData, file) => {
 
 export const deleteUser = async (userId) => {
     try {
-        const user = await findUserById(userId)
+        const user = await userRepository.getUserById(userId)
 
         if (!user) {
             throw new Error('Usuario no encontrado')
         }
 
-        await deleteCartById(user.cart)
-        await deleteUserById(userId)
+        await Cart.findByIdAndDelete(user.cart)
+        await userRepository.deleteUser(userId)
 
         return user
     } catch (error) {
@@ -56,6 +56,20 @@ export const logoutUser = (req) => {
     })
 }
 
+export const sendMessageUser = async (userId, message) => {
+    const user = await userRepository.getUserById(userId)
+
+    if (!user) {
+        throw new Error('Usuario no encontrado')
+    }
+
+    const newMessage = await userRepository.createMessage({ user: userId, message })
+    user.messages.push(newMessage._id)
+    await user.save()
+
+    return newMessage
+}
+
 export const registerUser = async (userData) => {
     const { first_name, last_name, email, age, password, password2 } = userData
 
@@ -63,13 +77,13 @@ export const registerUser = async (userData) => {
         throw new Error('Las contraseñas no coinciden.')
     }
 
-    const existingUser = await findUserByEmail(email)
+    const existingUser = await userRepository.getUserByEmail(email)
 
     if (existingUser) {
         throw new Error('El email ya está en uso.')
     }
 
-    const newUser = await createUser({ first_name, last_name, email, age, password })
+    const newUser = await userRepository.createUser({ first_name, last_name, email, age, password })
     const newCart = new Cart()
     await newCart.save()
     newUser.cart = newCart._id
@@ -79,26 +93,13 @@ export const registerUser = async (userData) => {
 }
 
 export const initializeAdmins = async () => {
-    /* const superadminEmail = process.env.SUPERADMIN_EMAIL
-    const superAdminPassword = process.env.SUPERADMIN_PASSWORD */
     const adminEmail = process.env.ADMIN_EMAIL
     const adminPassword = process.env.ADMIN_PASSWORD
 
-    /* const superadmin = await findUserByEmail(superadminEmail) */
-    const admin = await findUserByEmail(adminEmail)
-
-    /* if (!superadmin) {
-        await createSuperadmin({
-            first_name: 'SuperAdmin',
-            email: superadminEmail,
-            password: superAdminPassword,
-            role: 'superadmin'
-        })
-        console.log('Superadmin user created.')
-    } */
+    const admin = await userRepository.getUserByEmail(adminEmail)
 
     if (!admin) {
-        await createAdmin({
+        await userRepository.createAdmin({
             first_name: 'Admin',
             email: adminEmail,
             password: adminPassword,

@@ -1,4 +1,9 @@
-import { updateProfile as updateProfileService, deleteUser as deleteUserService, logoutUser as logoutUserService } from '../services/userService.js'
+import {
+    updateProfile as updateProfileService,
+    deleteUser as deleteUserService,
+    logoutUser as logoutUserService,
+    sendMessageUser as sendMessageUserService
+} from '../services/userService.js'
 
 export const logoutUser = async (req, res) => {
     try {
@@ -34,5 +39,17 @@ export const deleteUser = async (req, res) => {
     } catch (error) {
         console.error('Error al eliminar el perfil:', error)
         res.status(500).json({ error: 'Error al eliminar el perfil.' })
+    }
+}
+
+export const sendMessageUser = async (req, res) => {
+    const { message, userId } = req.body
+
+    try {
+        await sendMessageUserService(userId, message)
+        res.status(200).json({ message: 'Mensaje enviado correctamente.' })
+    } catch (error) {
+        console.error('Error al enviar mensaje:', error)
+        res.status(500).json({ error: 'Error al enviar mensaje.' })
     }
 }
