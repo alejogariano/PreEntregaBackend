@@ -13,7 +13,6 @@ import methodOverride from 'method-override'
 import productsRouter from './routes/api/productsRouter.js'
 import userRouter from './routes/api/userRouter.js'
 import cartRouter from './routes/api/cartRouter.js'
-import authRouter from './routes/api/authRouter.js'
 import chatRouter from './routes/api/chatRouter.js'
 import viewsRouter from './routes/views/viewsRouter.js'
 import './config/passportConfig.js'
@@ -55,7 +54,7 @@ app.use((req, res, next) => {
 
 app.engine('handlebars', engine({
     helpers: {
-        equals: (a, b) => a === b,
+        equals: (a, b) => String(a) === String(b),
         different: (a, b) => String(a) !== String(b),
         calculateSubtotal: (price, quantity) => price * quantity,
         calculateTotal: (products) => {
@@ -79,7 +78,6 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartRouter)
 app.use('/api/chat', chatRouter)
-app.use('/', authRouter)
 app.use('/', userRouter)
 app.use('/', viewsRouter)
 
