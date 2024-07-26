@@ -1,21 +1,55 @@
+import ProductDaoMongo from '../dao/mongo/productDao.js'
+import ProductDTO from '../dto/productDTO.js'
 import Product from '../models/productModel.js'
 
+const productDao = new ProductDaoMongo()
+
 export default {
-    getAllProducts: async () => await Product.find().lean(),
-    getProductById: async (id) => await Product.findById(id),
-    updateProductStock: async (product) => {
-        try {
-            const updatedProduct = await Product.findByIdAndUpdate(
-                product._id,
-                { $set: { stock: product.stock } },
-                { new: true }
-            )
-            return updatedProduct
-        } catch (error) {
-            console.error('Error al actualizar el stock del producto:', error)
-            throw new Error('No se pudo actualizar el stock del producto')
-        }
+    getAllProducts: async () => {
+        const products = await productDao.findAll()
+        return products.map(product => new ProductDTO(product))
     },
+
+    getProductById: async (id) => {
+        const product = await productDao.findById(id)
+        if (product) {
+            return new ProductDTO(product)
+        }
+        throw new Error('Product not found')
+    },
+
+    createProduct: async (productData) => {
+        const newProduct = await productDao.createProduct(productData)
+        return new ProductDTO(newProduct)
+    },
+
+    updateProduct: async (productData) => {
+        const updatedProduct = await productDao.updateProduct(productData)
+        return new ProductDTO(updatedProduct)
+    },
+
+    deleteProductById: async (id) => {
+        await productDao.deleteProductById(id)
+        return { message: 'Product deleted successfully' }
+    },
+
+    updateProductStock: async (id, stock) => {
+        const product = await productDao.findById(id)
+        if (!product) {
+            throw new Error('Product not found')
+        }
+        product.stock = stock
+        const updatedProduct = await productDao.updateProduct(product)
+        return new ProductDTO(updatedProduct)
+    },
+
     getPaginatedProducts: async (filter, options) => await Product.paginate(filter, options),
-    getDistinctCategories: async () => await Product.distinct('category')
+    /* getPaginatedProducts: async (filter, options) => {
+        const products = await productDao.getPagination(filter, options)
+        return products.map(product => new ProductDTO(product))
+    }, */
+
+    getDistinctCategories: async () => {
+        return await productDao.getDistinctCategories()
+    }
 }

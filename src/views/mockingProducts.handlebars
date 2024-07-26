@@ -23,6 +23,14 @@
     <div class="container mt-5" style="width: 1000px;">
         <div class="row mb-4">
             <div id="fixed-filters" class="fixed-filters col-md-3">
+                <div>
+                    <h3>Mock Products</h3>
+                    <button id="regenerateBtn" class="btn btn-primary">Generar nuevos productos</button>
+                    <br>
+                    <br>
+                    <a target="_blank" class="btn btn-primary" href="/mockingProducts/create">Agregar un producto</a>
+                </div>
+                <br>
                 <div class="mb-3">
                     <label for="query" class="form-label">¿Qué estás buscando?</label>
                     <input type="text" id="query" class="form-control" oninput="fetchProducts()">
@@ -40,18 +48,14 @@
                 <div class="mb-3">
                     <label for="limit" class="form-label">Límite</label>
                     <select id="limit" class="form-select" onchange="fetchProducts()">
-                        <option value="3">3</option>
-                        <option value="6">6</option>
-                        <option value="10" selected>10</option>
+                        <option value="10">10</option>
                         <option value="20">20</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
                     </select>
                 </div>
-                <div id="category" class="mb-3">
-                    <label for="categoryFilter" class="form-label">Categoría</label>
-                    <div id="categoryFilter"></div>
-                </div>
                 <div>
-                    <a href="/products">Limpiar filtros</a>
+                    <a href="/mockingProducts">Limpiar filtros</a>
                 </div>
             </div>
 
@@ -109,7 +113,6 @@
         }
     
         document.addEventListener('DOMContentLoaded', async () => {
-            await loadCategories()
             fetchProducts()
 
             const fixedFilters = document.getElementById('fixed-filters')
@@ -125,31 +128,15 @@
             window.addEventListener('resize', adjustFiltersPosition)
         })
 
-        async function loadCategories() {
-            const response = await fetch('/api/products/categories')
-            const data = await response.json()
-            const categoryDiv = document.getElementById('categoryFilter')
-
-            if (data.status === 'success') {
-                categoryDiv.innerHTML = data.categories.map(category => `
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="category-${category}" value="${category}" onchange="fetchProducts()">
-                        <label class="form-check-label" for="category-${category}">${category}</label>
-                    </div>
-                `).join('')
-            }
-        }
-
         async function fetchProducts(page = 1) {
             const limit = document.getElementById('limit').value
             const sort = document.getElementById('sort').value
             const query = document.getElementById('query').value
             const categories = Array.from(document.querySelectorAll('.form-check-input:checked')).map(input => input.value)
 
-            let url = `/api/products?limit=${limit}&page=${page}`
+            let url = `/api/products/mockingproducts?limit=${limit}&page=${page}`
             if (sort) url += `&sort=${sort}`
             if (query) url += `&query=${query}`
-            if (categories.length > 0) url += `&categories=${categories.join(',')}`
 
             try {
                 const response = await fetch(url)
@@ -164,7 +151,7 @@
                     productsDiv.innerHTML = data.payload.map(product => `
                         <div class="col-md-4 mb-4">
                             <div class="card">
-                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" style="height: 150px" alt="${product.description}"><a href="/products/${product._id}" class="btn btn-outline-info">Ver Detalle</a></img>
+                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" style="height: 150px" alt="${product.description}"></img>
                                 <div class="card-body">
                                     <h5 class="card-title">${product.name}</h5>
                                     <p class="card-text">${product.description}</p>
@@ -172,7 +159,7 @@
                                     <p class="card-text"><strong>Stock:</strong> ${product.stock}</p>
                                     {{#if (equals user.role "user")}}
                                         ${product.stock === 0 ?
-                                        `<button class="btn btn-danger" style="cursor: not-allowed" disabled>Sin stock</button>` : 
+                                        `<button class="btn btn-danger" disabled>Sin stock</button>` : 
                                         (product.stock !== 0 ? 
                                             `<button class="add-cart btn btn-success" data-product-id="${product._id}" data-product-stock="${product.stock}">Agregar al carrito</button>` : 
                                             ``)}
@@ -271,5 +258,26 @@
             })
         })
     }
+
+    document.getElementById('regenerateBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/products/mockingProducts/regenerate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                const data = await response.json()
+                if (data.status === 'success') {
+                    Swal.fire('Success', data.message, 'success').then(() => {
+                        location.reload()
+                    })
+                } else {
+                    Swal.fire('Error', 'Failed to regenerate products', 'error')
+                }
+            } catch (error) {
+                Swal.fire('Error', 'An error occurred', 'error')
+            }
+        })
     </script>
 </body>

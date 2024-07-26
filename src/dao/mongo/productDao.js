@@ -20,6 +20,14 @@ class ProductDaoMongo {
     async deleteProductById(id) {
         return await Product.findByIdAndDelete(id)
     }
+
+    /* async getPagination(filter, options) {
+        return await Product.paginate(filter, options)
+    } */
+
+    async getDistinctCategories() {
+        return await Product.distinct('category')
+    }
 }
 
 export default ProductDaoMongo

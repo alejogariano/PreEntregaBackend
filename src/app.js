@@ -1,14 +1,15 @@
 import express from 'express'
 import dotenv from 'dotenv'
-import { engine } from 'express-handlebars'
-import mongoose from './config/dbConfig.js'
-import MongoStore from 'connect-mongo'
 import session from 'express-session'
-import { createServer } from 'http'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import mongoose from './config/dbConfig.js'
 import passport from 'passport'
 import methodOverride from 'method-override'
+import MongoStore from 'connect-mongo'
+import path from 'path'
+import bodyParser from 'body-parser'
+import { engine } from 'express-handlebars'
+import { createServer } from 'http'
+import { fileURLToPath } from 'url'
 
 import productsRouter from './routes/api/productsRouter.js'
 import userRouter from './routes/api/userRouter.js'
@@ -16,6 +17,9 @@ import cartRouter from './routes/api/cartRouter.js'
 import chatRouter from './routes/api/chatRouter.js'
 import viewsRouter from './routes/views/viewsRouter.js'
 import './config/passportConfig.js'
+import handleErrors from './middlewares/errorHandler.js'
+import logger from './utils/logger.js'
+import loggerRouter from './routes/api/loggerRouter.js'
 
 dotenv.config()
 
@@ -39,8 +43,15 @@ app.use(session({
     }
 }))
 
+app.use((req, res, next) => {
+    logger.http(`${req.method} ${req.url}`)
+    next()
+})
+
 app.use(passport.initialize())
 app.use(passport.session())
+app.use(handleErrors)
+app.use(bodyParser.json())
 
 app.use(methodOverride('_method'))
 
@@ -80,8 +91,21 @@ app.use('/api/carts', cartRouter)
 app.use('/api/chat', chatRouter)
 app.use('/', userRouter)
 app.use('/', viewsRouter)
+app.use('/', loggerRouter)
 
 const PORT = process.env.PORT
+const LOGGER = process.env.LOGGER_ENV
+
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}/login`)
+    if (LOGGER === 'production') {
+        console.log('Logger is in production mode')
+    } else {
+        console.log('Logger is in development mode')
+    }
+})
+
+app.use((err, req, res, next) => {
+    logger.error(`${err.message}`)
+    res.status(500).send('Algo salió mal!')
 })

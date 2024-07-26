@@ -1,4 +1,6 @@
 import productRepository from '../repositories/productRepository.js'
+import { generateMockProducts } from '../utils/generateMockProducts.js'
+import MockingProduct from '../models/mockingProductsModel.js'
 
 export const getProducts = async (query) => {
     const { limit = 10, page = 1, sort, query: searchQuery, categories } = query
@@ -35,4 +37,11 @@ export const getAllProducts = async () => {
 
 export const getCategories = async () => {
     return await productRepository.getDistinctCategories()
+}
+
+export const initializeMockProducts = async () => {
+    await MockingProduct.deleteMany({})
+    const products = generateMockProducts()
+    await MockingProduct.insertMany(products)
+    console.log('Mock products generated')
 }

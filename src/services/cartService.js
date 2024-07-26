@@ -3,7 +3,7 @@ import Cart from '../models/cartModel.js'
 import Ticket from '../models/ticketModel.js'
 import cartRepository from '../repositories/cartRepository.js'
 import productRepository from '../repositories/productRepository.js'
-import ticketRepository from '../repositories/ticketRepository.js'
+import ticketRepository from '../repositories/ticketRespository.js'
 import { sendPurchaseEmail } from '../utils/emailService.js'
 
 export const getCartById = async (cartId) => {
@@ -93,7 +93,6 @@ export const purchaseCart = async (cartId, user) => {
         })
 
         await ticketRepository.createTicket(ticket)
-        console.log('Ticket creado:', ticket)
 
         cart.products = cart.products.filter(cartProduct => unavailableProducts.includes(cartProduct.product._id))
         await cartRepository.updateCart(cart)

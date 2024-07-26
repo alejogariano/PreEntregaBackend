@@ -4,6 +4,7 @@ import User from '../../models/userModel.js'
 import Cart from '../../models/cartModel.js'
 import Product from '../../models/productModel.js'
 import Message from '../../models/messageModel.js'
+import MockingProduct from '../../models/mockingProductsModel.js'
 
 const router = express.Router()
 
@@ -305,6 +306,26 @@ router.get('/login', async (req, res) => {
 
 router.get('/register', async (req, res) => {
     res.render('register', {
+        style: 'style.css'
+    })
+})
+
+router.get('/mockingProducts', async (req, res) => {
+    const products = await MockingProduct.find()
+    res.render('mockingProducts', {
+        style: 'style.css',
+        products
+    })
+})
+
+router.get('/mockingProducts/create', async (req, res) => {
+    res.render('createMockingProduct', {
+        style: 'style.css'
+    })
+})
+
+router.get('/loggerTestView', (req, res) => {
+    res.render('loggerTestView', {
         style: 'style.css'
     })
 })
