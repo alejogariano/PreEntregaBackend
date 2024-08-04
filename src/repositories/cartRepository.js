@@ -1,9 +1,28 @@
-import Cart from '../models/cartModel.js'
+import cartDAO from '../dao/mongo/cartDAO.js'
+import CartDTO from '../dto/cartDTO.js'
 
-export default {
-    getCartById: async (id) => await Cart.findById(id).populate('products.product'),
-    updateCart: async (cart) => await cart.save(),
-    createTicket: async (ticket) => await ticket.save(),
-    deleteProductFromCart: async (cid, pid) => await Cart.updateOne({ _id: cid }, { $pull: { products: { product: pid } } }),
-    deleteAllProductsFromCart: async (cid) => await Cart.updateOne({ _id: cid }, { $set: { products: [] } }),
+class CartRepository {
+    async getCartById(id) {
+        const cart = await cartDAO.getCartById(id)
+        return cart ? new CartDTO(cart) : null
+    }
+
+    async getCartByIdRaw(id) {
+        return await cartDAO.getCartByIdRaw(id)
+    }
+
+    async updateCart(cart) {
+        const updatedCart = await cartDAO.updateCart(cart)
+        return new CartDTO(updatedCart)
+    }
+
+    async deleteProductFromCart(cid, pid) {
+        await cartDAO.deleteProductFromCart(cid, pid)
+    }
+
+    async deleteAllProductsFromCart(cid) {
+        await cartDAO.deleteAllProductsFromCart(cid)
+    }
 }
+
+export default new CartRepository()

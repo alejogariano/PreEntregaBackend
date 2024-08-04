@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid'
-import Cart from '../models/cartModel.js'
 import Ticket from '../models/ticketModel.js'
 import cartRepository from '../repositories/cartRepository.js'
 import productRepository from '../repositories/productRepository.js'
@@ -11,7 +10,7 @@ export const getCartById = async (cartId) => {
 }
 
 export const addProductToCart = async (cartId, productId, quantity) => {
-    const cart = await Cart.findById(cartId)
+    const cart = await cartRepository.getCartByIdRaw(cartId)
     if (!cart) {
         throw new Error('Carrito no encontrado')
     }
@@ -37,7 +36,7 @@ export const updateProductQuantity = async (cartId, productId, quantity) => {
         throw new Error('Cantidad inválida')
     }
 
-    const cart = await cartRepository.getCartById(cartId)
+    const cart = await cartRepository.getCartByIdRaw(cartId)
     if (!cart) {
         throw new Error('Carrito no encontrado')
     }
@@ -61,7 +60,7 @@ export const clearCartProducts = async (cartId) => {
 }
 
 export const purchaseCart = async (cartId, user) => {
-    const cart = await cartRepository.getCartById(cartId)
+    const cart = await cartRepository.getCartByIdRaw(cartId)
     if (!cart) {
         throw new Error('Carrito no encontrado')
     }
@@ -71,25 +70,27 @@ export const purchaseCart = async (cartId, user) => {
     const purchasedProducts = []
 
     for (const cartProduct of cart.products) {
-        const product = await productRepository.getProductById(cartProduct.product._id)
-        if (product.stock < cartProduct.quantity) {
-            unavailableProducts.push(cartProduct.product._id)
+        const productDTO = await productRepository.getProductById(cartProduct.product._id)
+        const productId = productDTO.id
+
+        if (productDTO.stock < cartProduct.quantity) {
+            unavailableProducts.push(productId)
         } else {
-            product.stock -= cartProduct.quantity
-            await productRepository.updateProductStock(product)
-            totalAmount += product.price * cartProduct.quantity
-            purchasedProducts.push({ product: cartProduct.product._id, quantity: cartProduct.quantity })
+            productDTO.stock -= cartProduct.quantity
+            await productRepository.updateProductStock(productId, productDTO.stock)
+            totalAmount += productDTO.price * cartProduct.quantity
+            purchasedProducts.push({ product: productDTO, quantity: cartProduct.quantity })
         }
     }
 
-    const purchasedProductsEmail = cart.products.filter(cartProduct => !unavailableProducts.includes(cartProduct.product._id))
+    const purchasedProductsEmail = purchasedProducts.filter(p => !unavailableProducts.includes(p.product.id))
 
     if (purchasedProducts.length > 0) {
         const ticket = new Ticket({
             code: uuidv4(),
             amount: totalAmount,
             purchaser: user.email,
-            products: purchasedProducts
+            products: purchasedProducts.map(p => ({ product: p.product.id, quantity: p.quantity }))
         })
 
         await ticketRepository.createTicket(ticket)

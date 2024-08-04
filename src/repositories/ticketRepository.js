@@ -1,5 +1,9 @@
-import Ticket from '../models/ticketModel.js'
+import ticketDAO from '../dao/mongo/ticketDAO.js'
 
-export default {
-    createTicket: async (ticket) => await ticket.save()
+class ticketRepository {
+    async createTicket(ticket) {
+        return await ticketDAO.createTicket(ticket)
+    }
 }
+
+export default new ticketRepository()

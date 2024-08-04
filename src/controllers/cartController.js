@@ -4,7 +4,7 @@ import {
     updateProductQuantity as updateProductQuantityService,
     removeProductFromCart as removeProductFromCartService,
     clearCartProducts as clearCartProductsService,
-    purchaseCart as purchaseCartService,
+    purchaseCart,
 } from '../services/cartService.js'
 import { sendSMS } from '../utils/smsService.js'
 import logger from '../utils/logger.js'
@@ -33,13 +33,13 @@ export const updateCart = async (req, res) => {
         }
 
         products.forEach(({ productId, quantity }) => {
-            const productIndex = cart.products.findIndex(p => p.product._id.toString() === productId)
+            const productIndex = cart.products.findIndex(p => p.productId === productId)
             if (productIndex > -1) {
                 cart.products[productIndex].quantity = quantity
             }
         })
 
-        await cart.save()
+        await cartRepository.updateCart(cart)
         res.json({ status: 'success', cart })
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message })
@@ -107,21 +107,22 @@ export const getPurchase = async (req, res) => {
     const { phoneNumber } = req.body
 
     try {
-        const { ticket } = await purchaseCartService(cid, user)
-        if (ticket) {
-            if (method === 'sms' && phoneNumber) {
-                const message = `Tu compra ha sido confirmada. Código de compra: ${ticket.code}, Monto: $${ticket.amount}`
-                try {
-                    await sendSMS(phoneNumber, message)
-                } catch (error) {
-                    console.error('Error enviando el SMS:', error)
-                }
-            }
-
-            res.json({ status: 'success', message: 'Compra realizada', ticket })
-        } else {
-            res.status(400).json({ status: 'error', message: 'No se pudo completar la compra.' })
+        const { ticket, unavailableProducts } = await purchaseCart(cid, user)
+        
+        if (!ticket) {
+            return res.status(400).json({ status: 'error', message: 'No se pudo completar la compra.', unavailableProducts })
         }
+
+        if (method === 'sms' && phoneNumber) {
+            const message = `Tu compra ha sido confirmada. Código de compra: ${ticket.code}, Monto: $${ticket.amount}`
+            try {
+                await sendSMS(phoneNumber, message)
+            } catch (error) {
+                console.error('Error enviando el SMS:', error)
+            }
+        }
+
+        res.json({ status: 'success', message: 'Compra realizada', ticket })
     } catch (err) {
         res.status(500).json({ status: 'error', message: err.message })
     }

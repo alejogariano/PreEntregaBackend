@@ -1,8 +1,9 @@
-import ProductDaoMongo from '../dao/mongo/productDao.js'
+import ProductDaoMongo from '../dao/mongo/productDAO.js'
 import ProductDTO from '../dto/productDTO.js'
 import Product from '../models/productModel.js'
 
 const productDao = new ProductDaoMongo()
+//comentario de prueba
 
 export default {
     getAllProducts: async () => {
