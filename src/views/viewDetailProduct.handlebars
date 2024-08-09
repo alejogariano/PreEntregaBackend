@@ -8,7 +8,7 @@
             </h3>
         {{else}}
             <h3>
-                Bienvenido, Administrador:
+                Bienvenido, usuario {{user.role}}:
             </h3>
             <h3>
                 <strong>{{user.first_name}}</strong>
@@ -33,6 +33,7 @@
                 <p><strong>Precio:</strong> ${{product.price}}</p>
                 <p><strong>Categoría:</strong> {{product.category}}</p>
                 <p><strong>Stock:</strong> {{product.stock}}</p>
+                <p><strong>Vendedor:</strong> {{product.owner}}</p>
                 <p class="list-group-item"><strong>Última modificación: </strong>{{product.formattedUpdatedAt}}</p>
                 {{#if (equals user.role "user")}}
                     {{#if (equals product.stock 0)}}
@@ -42,8 +43,8 @@
                         <a class="btn btn-info" href="/products">Seguir comprando...</a>
                         <a class="btn btn-info" href="/carts/{{user.cart._id}}">Ir al carrito</a>
                     {{/if}}
-                    
-                {{else}}
+                {{/if}}
+                {{#if (equals user.role "admin")}}
                     <a class="btn btn-info" target="_blank" href="/adminUpdateProduct/{{product._id}}">Editar</a>
                 {{/if}}
             </div>

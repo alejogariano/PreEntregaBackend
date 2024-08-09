@@ -1,6 +1,6 @@
 <div class="container">
     <h3>Bienvenido, <strong>{{user.first_name}}</strong></h3>
-    {{#if (equals user.role "user")}}
+    {{#if (different user.role "admin")}}
         <h1 class="mt-4">Chat</h1>
         <h5>Dejanos tu mensaje o inquietud, un administrador se contactará contigo lo antes posible!</h5>
         <br>

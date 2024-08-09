@@ -8,7 +8,7 @@
             </h3>
         {{else}}
             <h3>
-                Bienvenido, Administrador:
+                Bienvenido, usuario {{user.role}}:
             </h3>
             <h3>
                 <strong>{{user.first_name}}</strong>
@@ -170,7 +170,7 @@
                                     <p class="card-text">${product.description}</p>
                                     <p class="card-text"><strong>Precio:</strong> $${product.price}</p>
                                     <p class="card-text"><strong>Stock:</strong> ${product.stock}</p>
-                                    {{#if (equals user.role "user")}}
+                                    {{#if (different user.role "admin")}}
                                         ${product.stock === 0 ?
                                         `<button class="btn btn-danger" style="cursor: not-allowed" disabled>Sin stock</button>` : 
                                         (product.stock !== 0 ? 

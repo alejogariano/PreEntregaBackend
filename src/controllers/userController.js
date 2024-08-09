@@ -1,13 +1,17 @@
 import passport from 'passport'
 import dotenv from 'dotenv'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 import {
     updateProfile as updateProfileService,
     deleteUser as deleteUserService,
     logoutUser as logoutUserService,
     sendMessageUser as sendMessageUserService,
     registerUser,
-    initializeAdmins
+    /* initializeAdmins */
 } from '../services/userService.js'
+import User from '../models/userModel.js'
+import transporter from '../config/emailConfigs.js'
 
 dotenv.config()
 
@@ -94,6 +98,50 @@ export const loginUserHandler = (req, res, next) => {
     })(req, res, next)
 }
 
+export const forgotPassword = async (req, res) => {
+    const { email } = req.body
+    const user = await User.findOne({ email })
+    if (!user) return res.status(404).send('Correo no encontrado')
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+    const link = `http://localhost:8080/reset-password/${token}`
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Password Reset',
+        html: `<a href="${link}">Reset Password</a>`,
+    })
+
+    res.send('Correo enviado!')
+}
+
+export const resetPassword = async (req, res) => {
+    const { token } = req.params
+    const { password, confirmPassword } = req.body
+
+    if (password !== confirmPassword) {
+        return res.status(400).send('Passwords do not match')
+    }
+
+    let userId
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        userId = decoded.id
+    } catch (err) {
+        return res.status(400).send('Invalid or expired token')
+    }
+
+    const user = await User.findById(userId)
+    if (await bcrypt.compare(password, user.password)) {
+        return res.status(400).send('Cannot use the same password')
+    }
+
+    user.password = await bcrypt.hash(password, 10)
+    await user.save()
+    res.send('Password has been reset')
+}
+
 export const githubAuth = passport.authenticate('github', { scope: ['user:email'] })
 export const githubCallback = (req, res, next) => {
     passport.authenticate('github', {
@@ -110,6 +158,6 @@ export const googleCallback = (req, res, next) => {
     })(req, res, next)
 }
 
-export const initializeAdminsHandler = async () => {
+/* export const initializeAdminsHandler = async () => {
     await initializeAdmins()
-}
+} */

@@ -4,8 +4,10 @@ import {
     updateProfile,
     deleteUser,
     sendMessageUser,
-    registerUserHandler,
     loginUserHandler,
+    registerUserHandler,
+    forgotPassword,
+    resetPassword,
     githubAuth,
     githubCallback,
     googleAuth,
@@ -22,6 +24,8 @@ router.post('/chat', sendMessageUser)
 
 router.post('/login', loginUserHandler)
 router.post('/register', registerUserHandler)
+router.post('/forgot-password', forgotPassword)
+router.post('/reset-password/:token', resetPassword)
 
 router.get('/auth/github', githubAuth)
 router.get('/auth/github/callback', githubCallback)

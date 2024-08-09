@@ -8,6 +8,7 @@ import {
 } from '../services/cartService.js'
 import { sendSMS } from '../utils/smsService.js'
 import logger from '../utils/logger.js'
+import Product from '../models/productModel.js'
 
 export const getCart = async (req, res) => {
     try {
@@ -49,14 +50,25 @@ export const updateCart = async (req, res) => {
 export const addProductToCart = async (req, res) => {
     const { cid, pid } = req.params
     const { cantidad } = req.body
+    const userEmail = req.user.email
 
     try {
-        //http://localhost:8080/api/carts/668f3ac1dce6f2f89393e1db/products/665381fa74dba69ed7dedc79
-        //Dato: solo funciona si lo probas por Postman, no por la web (ya q manejo los errores desde sweetalert)
+        const product = await Product.findById(pid)
+        if (!product) {
+            logger.error(`Producto con ID ${pid} no encontrado`)
+            return res.status(404).json({ status: 'error', message: 'Producto no encontrado' })
+        }
+
+        if (userEmail === product.owner) {
+            logger.error(`Intento de agregar al carrito un producto propio por ${userEmail}`)
+            return res.status(400).json({ status: 'error', message: 'No puedes agregar tu propio producto al carrito' })
+        }
+
         if (isNaN(cantidad) || cantidad <= 0) {
             logger.error(`Intento de agregar al carrito con cantidad inválida: ${cantidad}`)
             return res.status(400).json({ status: 'error', message: 'La cantidad debe ser un número mayor que 0' })
         }
+
         await addProductToCartService(cid, pid, cantidad)
         logger.info(`Producto ${pid} agregado al carrito ${cid} con cantidad ${cantidad}`)
         res.json({ status: 'success', message: 'Producto agregado al carrito' })

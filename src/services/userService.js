@@ -92,7 +92,7 @@ export const registerUser = async (userData) => {
     return newUser
 }
 
-export const initializeAdmins = async () => {
+/* export const initializeAdmins = async () => {
     const adminEmail = process.env.ADMIN_EMAIL
     const adminPassword = process.env.ADMIN_PASSWORD
 
@@ -107,4 +107,4 @@ export const initializeAdmins = async () => {
         })
         console.log('Admin user created.')
     }
-}
+} */

@@ -13,12 +13,12 @@
         </button>
 
         <!-- menu colapsable -->
-         <div class="collapse navbar-collapse" id="botonmenu">
+          <div class="collapse navbar-collapse" id="botonmenu">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link active" href="/">Inicio</a>
                 </li>
-                {{#if (equals user.role "user")}}
+                {{#if (or (equals user.role "user") (equals user.role "premium"))}}
                     <li class="nav-item dropdown">
                         <a class="nav-link active dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Categorías
@@ -66,7 +66,7 @@
 
             <ul class="navbar-nav flex-wrap">
                 {{#if user}}
-                    {{#if (equals user.role "user")}}
+                    {{#if (or (equals user.role "user") (equals user.role "premium"))}}
                         <li class="nav-item dropdown btn-outline-secondary">
                             <a class="nav-link active dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{user.first_name}}
@@ -81,11 +81,14 @@
                                 <li><a class="dropdown-item" href="/carts/{{user.cart._id}}">Carrito</a></li>
                                 <li><a class="dropdown-item" href="/chat">Envianos un mensaje!</a></li>
                                 <li><a class="dropdown-item" href="/purchases">Mis compras</a></li>
-                                <li><a class="dropdown-item" href="#"><del>Publicar un producto</del></a></li>
-                                <li><a class="dropdown-item" href="#"><del>Editar un producto</del></a></li>
-                                <li><a class="dropdown-item" href="#"><del>Eliminar un producto</del></a></li>
+                                {{#if (equals user.role "premium")}}
+                                    <li><a class="dropdown-item" href="/adminAddProduct">Publicar un producto</a></li>
+                                    <li><a class="dropdown-item" href="/adminViewAllProducts">Ver mis productos</a></li>
+                                {{/if}}
                                 <li><a class="dropdown-item" href="#"><del>Favoritos</del></a></li>
-                                <li><a class="dropdown-item" href="#"><del>Notificaciones</del></a></li>
+                                {{#if (equals user.role "user")}}
+                                    <li><a class="dropdown-item" href="/profile">Comenzar a vender!</a></li>
+                                {{/if}}
                             </ul>
                         </li>
                         <a class="nav-link" href="/carts/{{user.cart._id}}">

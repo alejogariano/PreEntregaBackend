@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
     })
 })
 
-router.get('/products', authorizeRoles(['user', 'admin']), async (req, res) => {
+router.get('/products', authorizeRoles(['user', 'admin', 'premium']), async (req, res) => {
     try {
         const userId = req.user._id
         const user = await User.findById(userId).populate('cart').lean()
@@ -52,7 +52,7 @@ router.get('/products', authorizeRoles(['user', 'admin']), async (req, res) => {
     }
 })
 
-router.get('/products/:pid', authorizeRoles(['user', 'admin']), async (req, res) => {
+router.get('/products/:pid', authorizeRoles(['user', 'admin', 'premium']), async (req, res) => {
     try {
         const userId = req.user._id
         const user = await User.findById(userId).populate('cart').lean()
@@ -85,7 +85,7 @@ router.get('/products/:pid', authorizeRoles(['user', 'admin']), async (req, res)
     }
 })
 
-router.get('/products/category/:category', authorizeRoles(['user']), async (req, res) => {
+router.get('/products/category/:category', authorizeRoles(['user', 'premium']), async (req, res) => {
     try {
         const userId = req.user._id
         const user = await User.findById(userId).populate('cart').lean()
@@ -109,7 +109,7 @@ router.get('/products/category/:category', authorizeRoles(['user']), async (req,
     }
 })
 
-router.get('/carts/:cid', authorizeRoles(['user']), async (req, res) => {
+router.get('/carts/:cid', authorizeRoles(['user', 'premium']), async (req, res) => {
     const cartId = req.params.cid || res.locals.cartId
     try {
         const cart = await getPopulatedCart(cartId)
@@ -125,7 +125,7 @@ router.get('/carts/:cid', authorizeRoles(['user']), async (req, res) => {
     }
 })
 
-router.get('/profile', authorizeRoles(['user']), async (req, res) => {
+router.get('/profile', authorizeRoles(['user', 'premium']), async (req, res) => {
 
     const user = res.locals.user
     const options = { 
@@ -147,14 +147,14 @@ router.get('/profile', authorizeRoles(['user']), async (req, res) => {
     })
 })
 
-router.get('/profile/:uid', authorizeRoles(['user']), async (req, res) => {
+router.get('/profile/:uid', authorizeRoles(['user', 'premium']), async (req, res) => {
     res.render('uploadProfile', {
         style: 'style.css',
         user: res.locals.user
     })
 })
 
-router.get('/:cid/purchase', authorizeRoles(['user']), async (req, res) => {
+router.get('/:cid/purchase', authorizeRoles(['user', 'premium']), async (req, res) => {
     try {
         const cartId = req.params.cid
         const cart = await getPopulatedCart(cartId)
@@ -170,7 +170,7 @@ router.get('/:cid/purchase', authorizeRoles(['user']), async (req, res) => {
     }
 })
 
-router.get('/chat', authorizeRoles(['user', 'admin']), async (req, res) => {
+router.get('/chat', authorizeRoles(['user', 'premium', 'admin']), async (req, res) => {
     try {
         const messages = await Message.find().populate('user').populate('comments.user')
         res.render('chat', {
@@ -183,7 +183,7 @@ router.get('/chat', authorizeRoles(['user', 'admin']), async (req, res) => {
     }
 })
 
-router.get('/purchases', authorizeRoles(['user']), async (req, res) => {
+router.get('/purchases', authorizeRoles(['user', 'premium']), async (req, res) => {
     const user = req.user
     try {
         const populatedUser = await User.findById(user._id).populate({
@@ -210,34 +210,46 @@ router.get('/adminDashboard', authorizeRoles(['admin']), async (req, res) => {
     })
 })
 
-router.get('/adminViewAllProducts', authorizeRoles(['admin']), async (req, res) => {
+router.get('/adminViewAllProducts', authorizeRoles(['admin', 'premium']), async (req, res) => {
     try {
-        const products = await Product.find().lean()
-            res.render('adminViewAllProducts', {
-                style: 'style.css',
-                user: res.locals.user,
-                products
-            })
+        const user = req.user
+        let products
+
+        if (user.role === 'admin') {
+            products = await Product.find().lean()
+        } else if (user.role === 'premium') {
+            products = await Product.find({ owner: user.email })
+        }
+
+        res.render('adminViewAllProducts', {
+            user,
+            products,
+            style: 'style.css'
+        })
     } catch (error) {
         console.error(error)
         res.status(500).send('Error al obtener los productos')
     }
 })
 
-router.get('/adminAddProduct', authorizeRoles(['admin']), (req, res) => {
+router.get('/adminAddProduct', authorizeRoles(['premium', 'admin']), (req, res) => {
     res.render('adminAddProduct',{
         user: res.locals.user,
         style:'style.css'
     })
 })
 
-router.post('/adminAddProduct', authorizeRoles(['admin']), async (req, res) => {
+router.post('/adminAddProduct', authorizeRoles(['premium', 'admin']), async (req, res) => {
     try {
         let { name, description, price, category, availability, stock, thumbnail } = req.body
 
         if (!name || !description || !price || !category || !availability || !stock || !thumbnail) {
             return res.status(400).json({ error: 'Faltan parámetros' })
         }
+
+        console.log(req.user.role)
+        let owner = req.user.role === 'admin' ? 'admin' : req.user.email
+        console.log(owner)
 
         let newProduct = await Product.create({
             name,
@@ -246,7 +258,8 @@ router.post('/adminAddProduct', authorizeRoles(['admin']), async (req, res) => {
             category,
             availability,
             stock,
-            thumbnail
+            thumbnail,
+            owner
         })
 
         res.redirect('/adminViewAllProducts')
@@ -256,7 +269,7 @@ router.post('/adminAddProduct', authorizeRoles(['admin']), async (req, res) => {
     }
 })
 
-router.get('/adminUpdateProduct/:pid', authorizeRoles(['admin']), async (req, res) => {
+router.get('/adminUpdateProduct/:pid', authorizeRoles(['premium', 'admin']), async (req, res) => {
     try {
         const productById = await Product.findByIdAndUpdate(req.params.pid).lean()
         res.render('adminUpdateProduct', {
@@ -269,7 +282,7 @@ router.get('/adminUpdateProduct/:pid', authorizeRoles(['admin']), async (req, re
     }
 })
 
-router.post('/adminUpdateProduct/:pid', authorizeRoles(['admin']), async (req, res) => {
+router.post('/adminUpdateProduct/:pid', authorizeRoles(['premium', 'admin']), async (req, res) => {
     try {
         let { pid } = req.params
         await Product.findByIdAndUpdate(pid, req.body)
@@ -280,13 +293,13 @@ router.post('/adminUpdateProduct/:pid', authorizeRoles(['admin']), async (req, r
     }
 })
 
-router.delete('/adminDeleteProduct/:pid', authorizeRoles(['admin']), async (req, res) => {
+router.delete('/adminDeleteProduct/:pid', authorizeRoles(['premium', 'admin']), async (req, res) => {
     let { pid } = req.params
     let result = await Product.deleteOne({ _id: pid })
     res.send({ result: "success", payload: result })
 })
 
-router.get('/adminDeleteProduct/:pid', authorizeRoles(['admin']), async (req, res) => {
+router.get('/adminDeleteProduct/:pid', authorizeRoles(['premium', 'admin']), async (req, res) => {
     try {
         const { pid } = req.params
         await Product.findByIdAndDelete(pid)
@@ -326,6 +339,29 @@ router.get('/mockingProducts/create', async (req, res) => {
 
 router.get('/loggerTestView', (req, res) => {
     res.render('loggerTestView', {
+        style: 'style.css'
+    })
+})
+
+router.get('/forgot-password', (req, res) => {
+    res.render('forgot-password', {
+        style: 'style.css'
+    })
+})
+
+router.get('/reset-password/:token', (req, res) => {
+    const { token } = req.params
+    let expired = false
+
+    try {
+        jwt.verify(token, process.env.JWT_SECRET)
+    } catch (err) {
+        expired = true
+    }
+
+    res.render('reset-password', {
+        token,
+        expired,
         style: 'style.css'
     })
 })

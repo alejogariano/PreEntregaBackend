@@ -4,11 +4,13 @@
             <div class="col">
                 <h1>Lista de productos</h1>
             </div>
-            <div class="col">
-                <a href="/adminAddProduct" class="btn btn-info">
-                    Agregar un producto...
-                </a>
-            </div>
+            {{#if (or (equals user.role "admin") (equals user.role "premium"))}}
+                <div class="col">
+                    <a href="/adminAddProduct" class="btn btn-info">
+                        Agregar un producto...
+                    </a>
+                </div>
+            {{/if}}
         </div>
     </div>
     {{#if products.length}}

@@ -1,7 +1,6 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
-
-import { initializeAdmins } from '../services/userService.js'
+/* import { initializeAdmins } from '../services/userService.js' */
 
 dotenv.config()
 
@@ -13,7 +12,7 @@ const db = mongoose.connection
 
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', () => {
-    initializeAdmins()
+    /* initializeAdmins() */
     console.log('Connected to MongoDB')
 })
 
