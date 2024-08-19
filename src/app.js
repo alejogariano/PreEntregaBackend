@@ -1,4 +1,5 @@
 import express from 'express'
+import swaggerDocs from './config/swaggerConfig.js'
 import dotenv from 'dotenv'
 import session from 'express-session'
 import mongoose from './config/dbConfig.js'
@@ -28,6 +29,7 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 const server = createServer(app)
+swaggerDocs(app)
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -102,10 +104,11 @@ const LOGGER = process.env.LOGGER_ENV
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}/login`)
     if (LOGGER === 'production') {
-        console.log('Logger is in production mode')
+        console.log('Logger is in production mode, running on http://localhost:8080/loggertestview')
     } else {
         console.log('Logger is in development mode')
     }
+    console.log('Swagger is running on http://localhost:8080/api-docs')
 })
 
 app.use((err, req, res, next) => {

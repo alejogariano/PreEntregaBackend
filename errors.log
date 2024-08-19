@@ -1,0 +1,104 @@
+2024-07-24 02:26:53 [31merror[39m: This is a error log message
+2024-07-24 02:28:40 [31merror[39m: This is a error log message
+2024-07-24 02:28:46 [35mfatal[39m: This is a fatal log message
+2024-07-24 02:29:52 [31merror[39m: [31mThis is a error log message[39m
+2024-07-24 02:30:05 [35mfatal[39m: [35mThis is a fatal log message[39m
+2024-07-24 02:31:28 [31merror[39m: [31mThis is a error log message[39m
+[31merror[39m: [31mThis is a error log message[39m
+2024-07-24 02:37:31 [31merror[39m: [31mThis is a error log message[39m
+2024-07-24 02:39:18 [31merror[39m: [31mThis is a error log message[39m
+2024-07-24 02:40:02 [35mfatal[39m: [35mThis is a fatal log message[39m
+[31merror[39m: This is a error log message
+[35mfatal[39m: This is a fatal log message
+2024-07-24 02:58:18 error: This is a error log message
+2024-07-24 02:58:20 fatal: This is a fatal log message
+2024-07-24 03:07:29 [31merror[39m: This is a error log message
+2024-07-24 03:08:18 [31merror[39m: This is a error log message
+2024-07-24 03:08:37 fatal: This is a fatal log message
+2024-07-24 03:08:43 error: This is a error log message
+2024-07-24 03:13:56 error: This is a error log message
+2024-07-24 03:13:58 fatal: This is a fatal log message
+2024-07-24 03:14:30 [31merror[39m: [31mThis is a error log message[39m
+2024-07-24 03:14:33 [35mfatal[39m: [35mThis is a fatal log message[39m
+2024-07-24 20:16:25 [31merror[39m: [31mThis is a error log message[39m
+2024-07-24 20:16:33 [35mfatal[39m: [35mThis is a fatal log message[39m
+2024-07-24 20:17:21 [31merror[39m: [31mThis is a error log message[39m
+2024-07-24 21:19:09 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:21:13 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:22:29 [31merror[39m: [31mFaltan completar campos: {"fields":["name"]}[39m
+2024-07-24 21:23:08 [31merror[39m: [31mInvalid data[39m
+2024-07-24 21:24:57 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:25:03 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:36:23 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:36:59 [31merror[39m: [31mInvalid data[39m
+2024-07-24 21:40:00 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:45:42 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:48:36 [31merror[39m: [31mThis is a error log message[39m
+2024-07-24 21:48:39 [35mfatal[39m: [35mThis is a fatal log message[39m
+2024-07-24 21:49:00 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:49:50 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 21:50:02 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 22:51:39 [31merror[39m: [31mFaltan completar campos: {"fields":["name","price"]}[39m
+2024-07-24 22:51:44 [31merror[39m: [31mFaltan completar campos: {"fields":["name","price"]}[39m
+2024-07-24 22:51:47 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:08:30 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:08:35 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:28:16 [31merror[39m: [31mExpected double-quoted property name in JSON at position 22[39m
+2024-07-24 23:30:02 [31merror[39m: [31mFaltan completar campos: {"fields":["name"]}[39m
+2024-07-24 23:30:17 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:33:08 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-24 23:35:11 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-24 23:40:21 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:41:02 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:41:38 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:42:21 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:43:00 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:43:13 [31merror[39m: [31mExpected double-quoted property name in JSON at position 22[39m
+2024-07-24 23:43:17 [31merror[39m: [31mExpected double-quoted property name in JSON at position 22[39m
+2024-07-24 23:43:27 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:44:56 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:45:07 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-24 23:46:29 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-24 23:46:38 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:47:45 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-24 23:50:20 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-24 23:50:43 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-24 23:52:15 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-25 21:37:50 [31merror[39m: [31mThis is a error log message[39m
+2024-07-25 21:37:59 [35mfatal[39m: [35mThis is a fatal log message[39m
+2024-07-25 21:45:50 [31merror[39m: [31mFaltan completar campos: {"fields":["name"]}[39m
+2024-07-25 21:47:28 [31merror[39m: [31mMockingProduct validation failed: price: Cast to Number failed for value "a" (type string) at path "price"[39m
+2024-07-25 21:49:35 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc79 al carrito 6680b82d69a514f664414981: Carrito no encontrado[39m
+2024-07-25 22:02:22 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc79 al carrito 668f3ac1dce6f2f89393e1db: Assignment to constant variable.[39m
+2024-07-25 22:02:45 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc79 al carrito 668f3ac1dce6f2f89393e1db: Assignment to constant variable.[39m
+2024-07-25 22:03:08 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc79 al carrito 668f3ac1dce6f2f89393e1db: logger.warn is not a function[39m
+2024-07-25 22:03:28 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc79 al carrito 668f3ac1dce6f2f89393e1db: Assignment to constant variable.[39m
+2024-07-25 22:06:17 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc79 al carrito 668f3ac1dce6f2f89393e1db: logger.warn is not a function[39m
+2024-07-25 22:10:31 [31merror[39m: [31mIntento de agregar al carrito con cantidad inválida: a[39m
+2024-07-25 22:10:59 [31merror[39m: [31mIntento de agregar al carrito con cantidad inválida: -1[39m
+2024-07-26 18:32:47 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-26 18:32:52 [31merror[39m: [31mFaltan completar campos: {"fields":["price"]}[39m
+2024-07-26 18:33:33 [31merror[39m: [31mFaltan completar campos: {"fields":["name"]}[39m
+2024-07-26 18:41:14 [31merror[39m: [31mThis is a error log message[39m
+2024-07-26 18:41:24 [35mfatal[39m: [35mThis is a fatal log message[39m
+2024-07-28 16:24:03 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc77 al carrito 668f3ac1dce6f2f89393e1db: cart.save is not a function[39m
+2024-07-28 16:24:38 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc77 al carrito 668f3ac1dce6f2f89393e1db: cart.save is not a function[39m
+2024-07-28 16:28:25 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc77 al carrito 668f3ac1dce6f2f89393e1db: Cart.save is not a function[39m
+2024-07-28 16:33:53 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc77 al carrito 668f3ac1dce6f2f89393e1db: cart.save is not a function[39m
+2024-07-28 16:35:16 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc77 al carrito 668f3ac1dce6f2f89393e1db: cart.save is not a function[39m
+2024-07-28 16:38:13 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc77 al carrito 668f3ac1dce6f2f89393e1db: cart.save is not a function[39m
+2024-07-28 16:46:19 [31merror[39m: [31mError al agregar producto 665381fa74dba69ed7dedc77 al carrito 668f3ac1dce6f2f89393e1db: cart.save is not a function[39m
+2024-07-28 18:54:34 [31merror[39m: [31mIntento de agregar al carrito con cantidad inválida: a[39m
+2024-07-28 18:54:43 [31merror[39m: [31mIntento de agregar al carrito con cantidad inválida: -3[39m
+2024-07-30 15:13:05 [31merror[39m: [31mThis is a error log message[39m
+2024-07-30 15:13:07 [35mfatal[39m: [35mThis is a fatal log message[39m
+2024-08-08 19:47:10 [31merror[39m: [31mCannot read properties of null (reading 'price')[39m
+2024-08-08 19:49:58 [31merror[39m: [31mCannot read properties of null (reading 'price')[39m
+2024-08-08 20:47:54 [31merror[39m: [31mParse error on line 174:[39m
+[31m...ifferent user.email ${product.owner})}}[39m
+[31m-----------------------^[39m
+[31mExpecting 'CLOSE_RAW_BLOCK', 'CLOSE', 'CLOSE_UNESCAPED', 'OPEN_SEXPR', 'CLOSE_SEXPR', 'ID', 'OPEN_BLOCK_PARAMS', 'STRING', 'NUMBER', 'BOOLEAN', 'UNDEFINED', 'NULL', 'DATA', 'SEP', got 'INVALID'[39m
+2024-08-08 21:07:52 [31merror[39m: [31mMissing helper: "eq"[39m
+2024-08-08 21:23:40 [31merror[39m: [31mError al agregar producto 66b54a70ef08530b64b4d5cb al carrito 668dc1db85b610c34582405f: Cast to ObjectId failed for value "admin" (type string) at path "_id" for model "User"[39m
+2024-08-08 21:29:31 [31merror[39m: [31mError al agregar producto 66b54a70ef08530b64b4d5cb al carrito 668dc1db85b610c34582405f: Cast to ObjectId failed for value "admin" (type string) at path "_id" for model "User"[39m
+2024-08-08 21:30:14 [31merror[39m: [31mError al agregar producto 66b54a70ef08530b64b4d5cb al carrito 668dc1db85b610c34582405f: Cast to ObjectId failed for value "admin" (type string) at path "_id" for model "User"[39m
