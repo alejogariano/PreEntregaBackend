@@ -18,7 +18,7 @@ document.getElementById('logoutButton').addEventListener('click', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    window.location.href = '/'
+                    window.location.href = '/login'
                 } else {
                     console.error('Error al cerrar sesión:', response.statusText)
                 }

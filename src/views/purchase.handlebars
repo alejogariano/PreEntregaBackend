@@ -1,79 +1,95 @@
-<h2>Perfil de Usuario</h2>
-
-<div class="card mb-3">
-    <div class="row g-0" style="align-items: center; margin:10px;">
-        <div class="col-md-4">
-            <img src="{{user.profile_image}}" class="img-fluid rounded-start" style="width: 540px;">
-        </div>
-        <div class="col-md-8">
-            <div class="card-body">
-                <h5 class="card-title">{{user.first_name}} {{user.last_name}}</h5>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><strong>Email: </strong>{{user.email}}</li>
-                    <li class="list-group-item"><strong>Edad: </strong>{{user.age}}</li>
-                    <li class="list-group-item"><strong>Registrado: </strong>{{user.formattedCreatedAt}}</li>
-                    <li class="list-group-item"><strong>Última modificación de perfil: </strong>{{user.formattedUpdatedAt}}</li>
-                </ul>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Verificar datos del ticket</h1>
+        <div class="card">
+            <div class="card-header">
+                Detalle del Carrito
             </div>
             <div class="card-body">
-                <a href="/profile/{{user._id}}"><button class="btn btn-success">Editar mi perfil</button></a>
-                <br><br>
-                <div class="accordion" id="accordionExample">
-                    <div class="accordion-item">
-                        <div class="accordion-header" id="headingOne">
-                            <button class="accordion-button collapsed btn btn-danger" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                Eliminar cuenta
-                            </button>
-                        </div>
-                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                            <div class="accordion-body" id="currentUserDetails">
-                                <button id="deleteProfileBtn" class="btn btn-outline-danger" style="margin-top: 10px;">☠ Si, deseo eliminar mi cuenta ☠</button>
-                            </div>
-                        </div>
+                {{#if cart.products.length}}
+                    <ul class="list-group mb-3">
+                        {{#each cart.products}}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">{{product.name}}</h5>
+                                    <small class="text-muted">Cantidad: {{quantity}}</small>
+                                </div>
+                                <span class="badge badge-primary badge-pill">${{calculateSubtotal this.product.price this.quantity}}</span>
+                            </li>
+                        {{/each}}
+                    </ul>
+                    <a href="/carts/{{cart._id}}" class="btn btn-info">Volver al carrito</a>
+                    <br>
+                    <br>
+                    <br>
+                    <hr>
+                    <button id="purchase-email-btn" class="btn btn-success btn-block">Confirmar - Recibir confirmación por email</button>
+                    <br>
+                    <hr>
+                    <div class="mt-2">
+                        <h5>Recuerda incresar la característica de tu país!</h5>
+                        <p>Ejemplo: +54 11 56633310</p>
+                        <input type="text" id="phone-number" class="form-control mb-2" placeholder="Ingresa tu número de teléfono">
+                        <button id="purchase-sms-btn" class="btn btn-primary btn-block">Confirmar - Recibir confirmación por email y SMS</button>
                     </div>
-                </div>
+                {{else}}
+                    <p class="text-muted">No hay productos en el carrito.</p>
+                {{/if}}
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.getElementById('deleteProfileBtn').addEventListener('click', function() {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "Esta acción es irreversible.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`/profile/{{user._id}}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
+    <script>
+        const handlePurchase = (url, phoneNumber) => {
+            const payload = phoneNumber ? { phoneNumber } : {}
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Compra realizada',
+                        text: data.message,
+                        footer: `Código de compra: ${data.ticket.code}`
+                    }).then(() => {
+                        window.location.href = '/purchases'
+                    })
+                } else {
+                    let productDetails = ''
+                    if (data.unavailableProducts && data.unavailableProducts.length > 0) {
+                        productDetails = 'Uno o más productos no están disponibles: Verifica el carrito de compras para comprobar el stock!'
                     }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error en la compra',
+                        text: data.message,
+                        footer: productDetails ? productDetails : ''
+                    }).then(() => {
+                        window.location.href = '/carts/{{cart._id}}'
+                    })
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al realizar la compra'
                 })
-                .then(response => {
-                    if (response.ok) {
-                        Swal.fire(
-                            'Eliminado!',
-                            'Tu perfil ha sido eliminado.',
-                            'success'
-                        ).then(() => {
-                            window.location.href = '/login?success=Perfil eliminado correctamente.'
-                        })
-                    } else {
-                        Swal.fire(
-                            'Error!',
-                            'Hubo un problema al eliminar tu perfil.',
-                            'error'
-                        )
-                    }
-                })
-            }
+            })
+        }
+
+        document.getElementById('purchase-email-btn').addEventListener('click', () => handlePurchase(`/api/carts/{{cart._id}}/purchase?method=email`))
+        document.getElementById('purchase-sms-btn').addEventListener('click', () => {
+            const phoneNumber = document.getElementById('phone-number').value
+            handlePurchase(`/api/carts/{{cart._id}}/purchase?method=sms`, phoneNumber)
         })
-    })
-</script>
+    </script>
+</body>

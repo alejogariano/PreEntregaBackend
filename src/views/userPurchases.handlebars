@@ -10,18 +10,27 @@
                     {{#each purchases}}
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="heading{{@index}}">
-                                <button class="btn btn-outline-dark accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{@index}}" aria-expanded="false" aria-controls="collapse{{@index}}">
-                                    <small><p>Fecha: {{this.createdAt}}</p></small>
-                                    Código: <strong>{{this.code}}</strong>
-                                </button>
+                                <div style="display: flex; gap:10px">
+                                    <img style="width: 100px;" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMW45d211d2JmMDJjZDlpcWtwZDdsNXp5YWdlcHU5eWdxZ2pxN3gyayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/chqkdGI4dwLsujNlph/giphy.webp" alt="">
+                                    <button style="display: flex; align-items:center; gap:15px" class="btn btn-outline-dark accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{@index}}" aria-expanded="false" aria-controls="collapse{{@index}}">
+                                        <div>
+                                            <small><p>Fecha: {{this.createdAt}}</p></small>
+                                            Código: <strong>{{this.code}}</strong>
+                                            <br>
+                                            Monto: <strong>${{this.amount}}</strong>
+                                        </div>
+                                        <div>
+                                            🔽
+                                        </div>
+                                    </button>
+                                </div>
                             </h2>
                             <div id="collapse{{@index}}" class="accordion-collapse collapse" aria-labelledby="heading{{@index}}">
                                 <div class="accordion-body">
-                                    <h5>Monto: <strong>${{this.amount}}</strong></h5>
-                                    <ul class="list-group">
+                                    <ul class="list-group" style="margin-bottom: 15px;">
                                         {{#each this.products}}
-                                            <li class="list-group-item">
-                                                <div style="display: flex; align-items:center; justify-content:space-between">
+                                            <li class="list-group-item" style="background-color: antiquewhite;">
+                                                <div style="display: flex; align-items:center; justify-content:space-between;">
                                                     <div>
                                                             <p><strong>Producto:</strong> {{this.product.name}}</p>
                                                             <p><strong>ID:</strong> {{this.product._id}}</p>
@@ -35,6 +44,7 @@
                                             </li>
                                         {{/each}}
                                     </ul>
+                                    <hr>
                                 </div>
                             </div>
                         </div>

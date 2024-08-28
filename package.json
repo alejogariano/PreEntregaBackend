@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node --watch src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "mocha test/*.test.js",
     "vercel-login": "vercel login",
     "vercel-dev": "vercel"
   },
@@ -30,11 +32,17 @@
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
+    "supertest": "^7.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "sweetalert2": "^11.11.0",
     "twilio": "^5.2.2",
     "uuid": "^10.0.0",
     "winston": "^3.13.1"
+  },
+  "devDependencies": {
+    "chai": "^5.1.1",
+    "mocha": "^10.7.3",
+    "nodemon": "^3.1.4"
   }
 }

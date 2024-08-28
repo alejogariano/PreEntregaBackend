@@ -50,7 +50,7 @@ export const updateCart = async (req, res) => {
 export const addProductToCart = async (req, res) => {
     const { cid, pid } = req.params
     const { cantidad } = req.body
-    const userEmail = req.user.email
+    /* const userEmail = req.user.email */
 
     try {
         const product = await Product.findById(pid)
@@ -59,10 +59,10 @@ export const addProductToCart = async (req, res) => {
             return res.status(404).json({ status: 'error', message: 'Producto no encontrado' })
         }
 
-        if (userEmail === product.owner) {
+        /* if (userEmail === product.owner) {
             logger.error(`Intento de agregar al carrito un producto propio por ${userEmail}`)
             return res.status(400).json({ status: 'error', message: 'No puedes agregar tu propio producto al carrito' })
-        }
+        } */
 
         if (isNaN(cantidad) || cantidad <= 0) {
             logger.error(`Intento de agregar al carrito con cantidad inválida: ${cantidad}`)

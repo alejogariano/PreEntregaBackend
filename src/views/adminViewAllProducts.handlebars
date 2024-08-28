@@ -21,6 +21,7 @@
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Precio</th>
+                    <th>Publicado por:</th>
                     <th></th>
                 </tr>
             </thead>
@@ -31,6 +32,7 @@
                         <td>{{this._id}}</td>
                         <td>{{this.name}}</td>
                         <td>${{this.price}}</td>
+                        <td>{{this.owner}}</td>
                         <td>
                             <a href="/adminUpdateProduct/{{this._id}}" class="btn btn-info">✏</a>
                         </td>

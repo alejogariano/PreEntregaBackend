@@ -7,13 +7,13 @@ import {
     deleteUser as deleteUserService,
     logoutUser as logoutUserService,
     sendMessageUser as sendMessageUserService,
-    registerUser,
-    /* initializeAdmins */
+    registerUser as registerUserService
 } from '../services/userService.js'
 import User from '../models/userModel.js'
 import transporter from '../config/emailConfigs.js'
 
 dotenv.config()
+const JWT_SECRET = process.env.JWT_SECRET
 
 export const logoutUser = async (req, res) => {
     try {
@@ -69,12 +69,46 @@ export const registerUserHandler = async (req, res) => {
     const userData = { first_name, last_name, email, age, password, password2 }
 
     try {
-        await registerUser(userData)
+        await registerUserService(userData)
         return res.redirect('/login?success=Usuario registrado correctamente. Por favor, inicie sesión.')
     } catch (error) {
         console.error('Error al registrar el usuario:', error)
         return res.redirect('/register?error=' + encodeURIComponent(error.message))
     }
+}
+
+export const changeUserRole = async (req, res) => {
+    try {
+        const userId = req.params.uid
+        const user = await User.findById(userId)
+
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' })
+        }
+
+        user.role = user.role === 'user' ? 'premium' : 'user'
+        await user.save()
+
+        res.status(200).json({ message: 'Rol actualizado', role: user.role })
+    } catch (error) {
+        res.status(500).json({ error: 'Error interno del servidor' })
+    }
+}
+
+export const githubAuth = passport.authenticate('github', { scope: ['user:email'] })
+export const githubCallback = (req, res, next) => {
+    passport.authenticate('github', {
+        failureRedirect: '/login?error=Autenticación con GitHub fallida.',
+        successRedirect: '/products'
+    })(req, res, next)
+}
+
+export const googleAuth = passport.authenticate('google', { scope: ['email'] })
+export const googleCallback = (req, res, next) => {
+    passport.authenticate('google', {
+        failureRedirect: '/login?error=Autenticación con Google fallida.',
+        successRedirect: '/products'
+    })(req, res, next)
 }
 
 export const loginUserHandler = (req, res, next) => {
@@ -98,64 +132,64 @@ export const loginUserHandler = (req, res, next) => {
     })(req, res, next)
 }
 
-export const forgotPassword = async (req, res) => {
+export const sendPasswordResetLink = async (req, res) => {
     const { email } = req.body
-    const user = await User.findOne({ email })
-    if (!user) return res.status(404).send('Correo no encontrado')
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
-    const link = `http://localhost:8080/reset-password/${token}`
+    try {
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(404).send('Usuario no encontrado')
+        }
 
-    await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Password Reset',
-        html: `<a href="${link}">Reset Password</a>`,
-    })
+        const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' })
 
-    res.send('Correo enviado!')
+        const resetLink = `${req.protocol}://${req.get('host')}/reset-password/${token}`
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER_NODEMAILER,
+            to: email,
+            subject: 'Restablecer contraseña',
+            html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><p><a href="${resetLink}">Restablecer contraseña</a></p>`,
+        })
+
+        res.send('Correo de recuperación enviado')
+    } catch (error) {
+        console.error('Error al enviar el correo de recuperación:', error)
+        res.status(500).send('Error al enviar el correo de recuperación')
+    }
 }
 
 export const resetPassword = async (req, res) => {
     const { token } = req.params
     const { password, confirmPassword } = req.body
 
-    if (password !== confirmPassword) {
-        return res.status(400).send('Passwords do not match')
-    }
-
-    let userId
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        userId = decoded.id
-    } catch (err) {
-        return res.status(400).send('Invalid or expired token')
+        const decoded = jwt.verify(token, JWT_SECRET)
+        const user = await User.findById(decoded.userId)
+        if (!user) {
+            return res.status(404).send('Usuario no encontrado')
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).send('Las contraseñas no coinciden')
+        }
+
+        const isSamePassword = await bcrypt.compare(password, user.password)
+        if (isSamePassword) {
+            return res.status(400).send('No puedes usar la misma contraseña')
+        }
+
+        user.password = password
+        await user.save()
+
+        res.send('Contraseña restablecida correctamente')
+    } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return res.redirect('/forgot-password?error=El enlace ha expirado. Solicita uno nuevo.')
+        }
+
+        console.error('Error al restablecer la contraseña:', error)
+        res.status(500).send('Error al restablecer la contraseña')
     }
-
-    const user = await User.findById(userId)
-    if (await bcrypt.compare(password, user.password)) {
-        return res.status(400).send('Cannot use the same password')
-    }
-
-    user.password = await bcrypt.hash(password, 10)
-    await user.save()
-    res.send('Password has been reset')
-}
-
-export const githubAuth = passport.authenticate('github', { scope: ['user:email'] })
-export const githubCallback = (req, res, next) => {
-    passport.authenticate('github', {
-        failureRedirect: '/login?error=Autenticación con GitHub fallida.',
-        successRedirect: '/products'
-    })(req, res, next)
-}
-
-export const googleAuth = passport.authenticate('google', { scope: ['email'] })
-export const googleCallback = (req, res, next) => {
-    passport.authenticate('google', {
-        failureRedirect: '/login?error=Autenticación con Google fallida.',
-        successRedirect: '/products'
-    })(req, res, next)
 }
 
 /* export const initializeAdminsHandler = async () => {
