@@ -10,3 +10,10 @@ export const authorizeRoles = (roles) => {
         next()
     }
 }
+
+export const checkUser = (req, res, next) => {
+    if (req.user) {
+        res.locals.user = req.user
+    }
+    next()
+}

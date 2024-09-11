@@ -6,9 +6,10 @@ import {
     clearCartProducts as clearCartProductsService,
     purchaseCart,
 } from '../services/cartService.js'
-import { sendSMS } from '../utils/smsService.js'
+/* import { sendSMS } from '../utils/smsService.js' */
 import logger from '../utils/logger.js'
 import Product from '../models/productModel.js'
+import Cart from '../models/cartModel.js'
 
 export const getCart = async (req, res) => {
     try {
@@ -28,19 +29,19 @@ export const updateCart = async (req, res) => {
     const { products } = req.body
 
     try {
-        const cart = await getCartById(cid)
+        const cart = await Cart.findById(cid).populate('products.product')
         if (!cart) {
             return res.status(404).json({ status: 'error', message: 'Carrito no encontrado' })
         }
 
         products.forEach(({ productId, quantity }) => {
-            const productIndex = cart.products.findIndex(p => p.productId === productId)
+            const productIndex = cart.products.findIndex(p => p.product._id.toString() === productId)
             if (productIndex > -1) {
                 cart.products[productIndex].quantity = quantity
             }
         })
 
-        await cartRepository.updateCart(cart)
+        await cart.save()
         res.json({ status: 'success', cart })
     } catch (error) {
         res.status(500).json({ status: 'error', message: error.message })
@@ -50,7 +51,7 @@ export const updateCart = async (req, res) => {
 export const addProductToCart = async (req, res) => {
     const { cid, pid } = req.params
     const { cantidad } = req.body
-    /* const userEmail = req.user.email */
+    const userEmail = req.user.email
 
     try {
         const product = await Product.findById(pid)
@@ -59,10 +60,10 @@ export const addProductToCart = async (req, res) => {
             return res.status(404).json({ status: 'error', message: 'Producto no encontrado' })
         }
 
-        /* if (userEmail === product.owner) {
+        if (userEmail === product.owner) {
             logger.error(`Intento de agregar al carrito un producto propio por ${userEmail}`)
             return res.status(400).json({ status: 'error', message: 'No puedes agregar tu propio producto al carrito' })
-        } */
+        }
 
         if (isNaN(cantidad) || cantidad <= 0) {
             logger.error(`Intento de agregar al carrito con cantidad inválida: ${cantidad}`)
@@ -115,8 +116,8 @@ export const deleteAllProductsFromCart = async (req, res) => {
 export const getPurchase = async (req, res) => {
     const { cid } = req.params
     const user = req.user
-    const { method } = req.query
-    const { phoneNumber } = req.body
+    /* const { method } = req.query
+    const { phoneNumber } = req.body */
 
     try {
         const { ticket, unavailableProducts } = await purchaseCart(cid, user)
@@ -125,14 +126,14 @@ export const getPurchase = async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'No se pudo completar la compra.', unavailableProducts })
         }
 
-        if (method === 'sms' && phoneNumber) {
+        /* if (method === 'sms' && phoneNumber) {
             const message = `Tu compra ha sido confirmada. Código de compra: ${ticket.code}, Monto: $${ticket.amount}`
             try {
                 await sendSMS(phoneNumber, message)
             } catch (error) {
                 console.error('Error enviando el SMS:', error)
             }
-        }
+        } */
 
         res.json({ status: 'success', message: 'Compra realizada', ticket })
     } catch (err) {

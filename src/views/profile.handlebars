@@ -17,14 +17,24 @@
             </div>
             <div class="card-body">
                 {{#if (equals user.role "user")}}
-                    <button class="btn btn-warning">Actualizar a Premium</button>
+                    <a href="/profile/{{user._id}}/documents">
+                        <button class="btn btn-warning">Subir documentos para ser Premium</button>
+                    </a>
                 {{else}}
-                    <button class="btn btn-warning">Actualizar a Usuario</button>
+                    <a href="/profile/{{user._id}}/documents">
+                        <button class="btn btn-warning">Actualizar mis documentos</button>
+                    </a>
                 {{/if}}
                 <br><br>
-                <a href="/forgot-password"><button class="btn btn-info">Cambiar contraseña</button></a>
+                {{#if (equals user.role "user")}}
+                    <button class="btn btn-warning change-role">Cambiar a Usuario Premium (sin subir documentos)</button>
+                {{else}}
+                    <button class="btn btn-warning change-role">Cambiar a Usuario común</button>
+                {{/if}}
                 <br><br>
                 <a href="/profile/{{user._id}}"><button class="btn btn-success">Editar mi perfil</button></a>
+                <br><br>
+                <a href="/forgot-password"><button class="btn btn-info">Cambiar contraseña</button></a>
                 <br><br>
                 <div class="accordion" id="accordionExample">
                     <div class="accordion-item">
@@ -82,6 +92,29 @@
                     }
                 })
             }
+        })
+    })
+
+    document.querySelector('.change-role').addEventListener('click', function() {
+        const userId = "{{user._id}}"
+        fetch(`/api/users/premium/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.role) {
+                Swal.fire('Éxito', `El rol ha sido cambiado a ${data.role}`, 'success').then(() => {
+                    window.location.reload()
+                })
+            } else {
+                Swal.fire('Error', 'No se pudo cambiar el rol', 'error')
+            }
+        })
+        .catch(error => {
+            Swal.fire('Error', 'Hubo un problema al cambiar el rol', 'error')
         })
     })
 </script>

@@ -102,3 +102,7 @@
 2024-08-08 21:23:40 [31merror[39m: [31mError al agregar producto 66b54a70ef08530b64b4d5cb al carrito 668dc1db85b610c34582405f: Cast to ObjectId failed for value "admin" (type string) at path "_id" for model "User"[39m
 2024-08-08 21:29:31 [31merror[39m: [31mError al agregar producto 66b54a70ef08530b64b4d5cb al carrito 668dc1db85b610c34582405f: Cast to ObjectId failed for value "admin" (type string) at path "_id" for model "User"[39m
 2024-08-08 21:30:14 [31merror[39m: [31mError al agregar producto 66b54a70ef08530b64b4d5cb al carrito 668dc1db85b610c34582405f: Cast to ObjectId failed for value "admin" (type string) at path "_id" for model "User"[39m
+2024-09-08 18:58:59 [31merror[39m: [31mUnexpected field[39m
+2024-09-08 19:05:36 [31merror[39m: [31mUnexpected field[39m
+2024-09-08 19:07:34 [31merror[39m: [31mUnexpected field[39m
+2024-09-08 19:11:11 [31merror[39m: [31mUnexpected field[39m

@@ -37,18 +37,18 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URL,
-        ttl: 30 * 60 * 1000 //30min //7 * 24 * 60 * 60 * 1000 // 7 dias
+        ttl: 30 * 60 * 1000 //=30min -------> 7 * 24 * 60 * 60 * 1000 = 7 dias
     }),
     cookie: { 
         secure: false,
-        maxAge: 30 * 60 * 1000 //30min //7 * 24 * 60 * 60 * 1000 // 7 dias
+        maxAge: 30 * 60 * 1000 //=30min -------> 7 * 24 * 60 * 60 * 1000 = 7 dias
     }
 }))
 
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
     logger.http(`${req.method} ${req.url}`)
     next()
-})
+}) */
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -102,13 +102,17 @@ const PORT = process.env.PORT
 const LOGGER = process.env.LOGGER_ENV
 
 server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}/login`)
     if (LOGGER === 'production') {
+        console.log(`Server is in production mode`)
+        console.log(`Server is running on http://localhost:${PORT}/login`)
         console.log('Logger is in production mode, running on http://localhost:8080/loggertestview')
+        console.log('Swagger is running on http://localhost:8080/api-docs')
     } else {
-        console.log('Logger is in development mode')
+        console.log(`Server is in development mode`)
+        console.log(`Server is running on https://2dapreentregabackend-production.up.railway.app`)
+        console.log('Logger is in development mode, running on https://2dapreentregabackend-production.up.railway.app/loggertestview')
+        console.log('Swagger is running on https://2dapreentregabackend-production.up.railway.app/api-docs')
     }
-    console.log('Swagger is running on http://localhost:8080/api-docs')
 })
 
 app.use((err, req, res, next) => {

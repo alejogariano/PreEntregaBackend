@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import Ticket from '../models/ticketModel.js'
 import cartRepository from '../repositories/cartRepository.js'
 import productRepository from '../repositories/productRepository.js'
-import ticketRepository from '../repositories/ticketRespository.js'
+import ticketRepository from '../repositories/ticketRepository.js'
 import { sendPurchaseEmail } from '../utils/emailService.js'
 
 export const getCartById = async (cartId) => {

@@ -1,0 +1,54 @@
+<h1>Cargar Documentos</h1>
+<h4>(Solo se permiten archivos JPEG, JPG, PNG o PDF!)</h4><br>
+    {{#if success}}
+        <div class="alert alert-success">{{success}}</div>
+    {{/if}}
+    {{#if error}}
+        <div class="alert alert-danger">{{error}}</div>
+    {{/if}}
+
+    <form action="/profile/{{user._id}}/documents" method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="identification" class="form-label">Identificación</label>
+        <input type="file" class="form-control" id="identification" name="documents[identification]" accept="image/*,.pdf" onchange="previewFile(this, 'identificationPreview')">
+        <div id="identificationPreview" class="preview-container"></div>
+    </div>
+
+    <div class="mb-3">
+        <label for="proofOfAddress" class="form-label">Comprobante de Domicilio</label>
+        <input type="file" class="form-control" id="proofOfAddress" name="documents[proofOfAddress]" accept="image/*,.pdf" onchange="previewFile(this, 'proofOfAddressPreview')">
+        <div id="proofOfAddressPreview" class="preview-container"></div>
+    </div>
+
+    <div class="mb-3">
+        <label for="accountStatement" class="form-label">Estado de Cuenta</label>
+        <input type="file" class="form-control" id="accountStatement" name="documents[accountStatement]" accept="image/*,.pdf" onchange="previewFile(this, 'accountStatementPreview')">
+        <div id="accountStatementPreview" class="preview-container"></div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Subir Documentos</button>
+</form>
+
+<script>
+    function previewFile(input, previewId) {
+        const file = input.files[0]
+        const previewContainer = document.getElementById(previewId)
+        previewContainer.innerHTML = ''
+
+        if (file) {
+            const fileType = file.type
+            if (fileType.startsWith('image/')) {
+                const imgPreview = document.createElement('img')
+                imgPreview.src = URL.createObjectURL(file)
+                imgPreview.style.maxWidth = '100px'
+                previewContainer.appendChild(imgPreview)
+            } else if (fileType === 'application/pdf') {
+                const pdfPreview = document.createElement('div')
+                pdfPreview.textContent = `Archivo PDF cargado: ${file.name}`
+                previewContainer.appendChild(pdfPreview)
+            } else {
+                previewContainer.textContent = `Archivo seleccionado: ${file.name}`
+            }
+        }
+    }
+</script>

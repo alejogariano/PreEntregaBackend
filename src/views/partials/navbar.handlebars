@@ -21,22 +21,22 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="/products">Productos</a>
                 </li>
-                {{#if (or (equals user.role "user") (equals user.role "premium"))}}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link active dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Categorías
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                            <li><a class="dropdown-item" href="/products/category/Accessories">Accessories</a></li>
-                            <li><a class="dropdown-item" href="/products/category/Books">Books</a></li>
-                            <li><a class="dropdown-item" href="/products/category/Clothing">Clothing</a></li>
-                            <li><a class="dropdown-item" href="/products/category/Electronics">Electronics</a></li>
-                            <li><a class="dropdown-item" href="/products/category/Furniture">Furniture</a></li>
-                            <li><a class="dropdown-item" href="/products/category/Home Appliances">Home Appliances</a></li>
-                            <li><a class="dropdown-item" href="/products/category/Stationery">Stationery</a></li>
-                        </ul>
-                    </li>
-                {{/if}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link active dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Categorías
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                        <li><a class="dropdown-item" href="/products/category/Accessories">Accessories</a></li>
+                        <li><a class="dropdown-item" href="/products/category/Books">Books</a></li>
+                        <li><a class="dropdown-item" href="/products/category/Clothing">Clothing</a></li>
+                        <li><a class="dropdown-item" href="/products/category/Electronics">Electronics</a></li>
+                        <li><a class="dropdown-item" href="/products/category/Furniture">Furniture</a></li>
+                        <li><a class="dropdown-item" href="/products/category/Home Appliances">Home Appliances</a></li>
+                        <li><a class="dropdown-item" href="/products/category/Stationery">Stationery</a></li>
+                    </ul>
+                </li>
+                {{!-- {{#if (or (equals user.role "user") (equals user.role "premium"))}}
+                {{/if}} --}}
                 {{#if user}}
                     <li class="nav-item dropdown">
                         <a class="nav-link active dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -64,9 +64,8 @@
                             <li><a class="dropdown-item" href="/adminDashboard">Panel de administración</a></li>
                             <li><a class="dropdown-item" href="/adminViewAllProducts">Administrar Productos</a></li>
                             <li><a class="dropdown-item" href="/adminAddProduct">Agregar producto</a></li>
-                            <li><a class="dropdown-item" href="/adminChat">Administrar Usuarios</a></li>
+                            <li><a class="dropdown-item" href="/adminViewAllUsers">Administrar Usuarios</a></li>
                             <li><a class="dropdown-item" href="/chat">Moderar Chat</a></li>
-                            <li><a class="dropdown-item" href="/adminPurchases">Ver Compras</a></li>
                         </ul>
                     </li>
                 {{/if}}

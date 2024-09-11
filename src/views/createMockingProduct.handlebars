@@ -72,6 +72,8 @@
                     icon: 'success',
                     title: 'Producto creado',
                     text: result.message,
+                }).then(() => {
+                        window.location.href = '/mockingProducts'
                 })
             } else {
                 const errorResult = await response.json()

@@ -15,10 +15,10 @@
             </h3>
         {{/if}}
     {{else}}
-        <p>
+        <h3 class="text-center">
             Inicia sesión para poder comprar!
             <a href="/login" class="btn btn-info">Iniciar</a>
-        </p>
+        </h3>
     {{/if}}
     <div class="container mt-5" style="width: 1000px;">
         <div class="row mb-4">
@@ -179,6 +179,8 @@
                                     {{/if}}
                                 </div>
                                 <div class="card-footer">
+                                    <small class="text-muted">Publicado por: ${product.owner}</small>
+                                    <br>
                                     <small class="text-muted">Updated: ${formatDate(product.updatedAt)}</small>
                                 </div>
                             </div>

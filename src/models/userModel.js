@@ -13,7 +13,13 @@ const userSchema = new mongoose.Schema({
     messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
     purchases: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
     ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Rating' }],
-    notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }]
+    notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }],
+    documents: [{
+        name: { type: String, required: true },
+        reference: { type: String, required: true }
+    }],
+    last_connection: { type: Date }
+
 }, { timestamps: true })
 
 userSchema.pre('save', async function (next) {
