@@ -10,7 +10,9 @@
         <br>
         <div class="text-center">
             <a href="/auth/github"><button class="btn btn-outline-secondary"><i class="fa-brands fa-github fa-beat" style="--fa-animation-duration: 5s;"></i> Ingresar con GitHub</button></a>
-            <a href="/auth/google"><button class="btn btn-outline-success"><i class="fa-brands fa-google fa-beat" style="--fa-animation-duration: 5s;"></i> Ingresar con Google</button></a>
+            {{#unless isProduction}}
+                <a href="/auth/google"><button class="btn btn-outline-success"><i class="fa-brands fa-google fa-beat" style="--fa-animation-duration: 5s;"></i> Ingresar con Google</button></a>
+            {{/unless}}
         </div>
         <hr>
         <br>

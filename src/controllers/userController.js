@@ -10,7 +10,9 @@ import {
     registerUser as registerUserService
 } from '../services/userService.js'
 import User from '../models/userModel.js'
-import transporter from '../config/emailConfig.js'
+import Cart from '../models/cartModel.js'
+import Product from '../models/productModel.js'
+import transporter from '../config/emailConfigs.js'
 
 dotenv.config()
 const JWT_SECRET = process.env.JWT_SECRET
@@ -106,6 +108,106 @@ export const deleteUser = async (req, res) => {
     } catch (error) {
         console.error('Error al eliminar el perfil:', error)
         res.status(500).json({ error: 'Error al eliminar el perfil.' })
+    }
+}
+
+export const sendEmail = async (to, subject, text) => {
+    try {
+        const mailOptions = {
+            from: process.env.EMAIL_USER_NODEMAILER,
+            to,
+            subject,
+            text,
+        }
+
+        await transporter.sendMail(mailOptions)
+    } catch (error) {
+        console.error(`Error al enviar correo a ${to}:`, error)
+    }
+}
+
+export const adminDeleteUser = async (req, res) => {
+    try {
+        const userId = req.params.uid
+        const deletedUser = await User.findById(userId)
+
+        if (!deletedUser) {
+            return res.status(404).send({ message: 'Usuario no encontrado' })
+        }
+
+        if (deletedUser.role !== 'admin') {
+            await deleteUserService(userId)
+            const productsToUpdate = await Product.find({ owner: deletedUser.email })
+            if (productsToUpdate.length > 0) {
+                const updateResult = await Product.updateMany(
+                    { owner: deletedUser.email },
+                    { $set: { stock: 0 } }
+                )
+            } else {
+                console.log('No se encontraron productos para actualizar')
+            }
+
+            if (deletedUser.email) {
+                await sendEmail(
+                    deletedUser.email,
+                    'Cuenta eliminada',
+                    'Tu cuenta ha sido eliminada por un administrador.'
+                )
+            } else {
+                console.error('Usuario eliminado no tiene correo registrado')
+            }
+        }
+
+        await User.findByIdAndDelete(userId)
+        res.status(200).send({ message: 'Usuario y datos asociados eliminados' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).send({ message: 'Error al eliminar el usuario y sus datos asociados' })
+    }
+}
+
+//const thresholdDate = new Date(now.getTime() - 30 * 60 * 1000) // 30 minutos
+//const thresholdDate = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000) // 2 días
+//const thresholdDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) // 7 días
+export const deleteInactiveUsers = async (req, res) => {
+    try {
+        const now = new Date()
+        const thresholdDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) // 30 días
+
+        const inactiveUsers = await User.find({ last_connection: { $lt: thresholdDate } })
+
+        for (let user of inactiveUsers) {
+            if (user.role === 'admin') continue
+
+            if (user.role === 'premium') {
+                user.role = 'user'
+                await user.save()
+                await sendEmail(user.email, 'Cambio de rol por inactividad', 'Tu cuenta ha sido degradada a usuario común. Inicia sesión para evitar perder tu cuenta.')
+            } else if (user.role === 'user') {
+                await Cart.deleteOne({ userId: user.cart._id })
+                await Product.updateMany({ owner: user.email }, { stock: 0 })
+                await sendEmail(user.email, 'Cuenta eliminada por inactividad', 'Tu cuenta ha sido eliminada.')
+                await User.deleteOne({ _id: user._id })
+            }
+        }
+
+        res.status(200).json({ message: 'Usuarios inactivos eliminados.' })
+    } catch (error) {
+        res.status(500).json({ error: 'Error al eliminar usuarios inactivos.' })
+    }
+}
+
+export const adminChangeUserRole = async (req, res) => {
+    try {
+        const userId = req.params.uid
+        const newRole = req.body.role
+
+        User.findByIdAndUpdate(userId, { role: newRole }, { new: true })
+            .then((updatedUser) => res.redirect('/adminViewAllUsers'))
+            .catch((error) => res.status(500).send({ message: 'Error al cambiar el rol del usuario' }))
+    } catch (error) {
+        console.error(error)
+        res.status(500).send('Algo salió mal')
     }
 }
 

@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             })
         } else {
-            window.location.href = `/${cartId}/purchase`
+            window.location.href = `/carts/${cartId}/purchase`
         }
     })
 })

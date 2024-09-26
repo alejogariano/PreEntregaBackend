@@ -26,40 +26,30 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
     }
 }))
 
-/* const callbackURL = process.env.LOGGER_ENV === 'production'
-    ? "http://localhost:8080/auth/github/callback"
-    : "https://2dapreentregabackend-production.up.railway.app/auth/github/callback"
-
-const CLIENT_ID = process.env.LOGGER_ENV === 'production'
-    ? process.env.GITHUB_CLIENT_ID_PRODUCTION
-    : process.env.GITHUB_CLIENT_ID_DEVELOPMENT
-
-const clientSecret = process.env.LOGGER_ENV === 'production'
-    ? process.env.GITHUB_CLIENT_SECRET_PRODUCTION
-    : process.env.GITHUB_CLIENT_SECRET_DEVELOPMENT */
+const isProduction = process.env.NODE_ENV === 'production'
 
 passport.use(new GitHubStrategy({
-    clientID: process.env.GITHUB_CLIENT_ID_PRODUCTION,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET_PRODUCTION,
-    /* callbackURL: callbackURL */
-    callbackURL: "http://localhost:8080/auth/github/callback"
-    /* callbackURL: "https://2dapreentregabackend-production.up.railway.app/auth/github/callback" */
+    clientID: isProduction 
+        ? process.env.GITHUB_CLIENT_ID_PRODUCTION 
+        : process.env.GITHUB_CLIENT_ID_DEVELOPMENT,
+    clientSecret: isProduction 
+        ? process.env.GITHUB_CLIENT_SECRET_PRODUCTION 
+        : process.env.GITHUB_CLIENT_SECRET_DEVELOPMENT,
+    callbackURL: isProduction 
+        ? process.env.GITHUB_CALLBACK_URL_PRODUCTION 
+        : process.env.GITHUB_CALLBACK_URL_DEVELOPMENT
 }, async (accessToken, refreshToken, profile, done) => {
     try {
         if (!profile.emails || !profile.emails[0].value) {
-            return done(new Error('No se pudo obtener el email del usuario de GitHub. Por favor revisa la privacidad de tu cuenta de GitHub y vuelve a intentarlo'))
+            return done(new Error('No se pudo obtener el email del usuario de GitHub.'))
         }
         
-        const email = profile.emails[0].value
-        const profilePhoto = Array.isArray(profile.photos) ? profile.photos[0].value : '../public/uploads/default.jpg'
-
-        let displayName = profile.displayName
-        if (!displayName) {
-            displayName = email.split('@')[0]
-        }
-
-        let user = await User.findOne({ email })
-
+        const email = profile.emails[0].value;
+        const profilePhoto = Array.isArray(profile.photos) ? profile.photos[0].value : '../public/uploads/default.jpg';
+        
+        let displayName = profile.displayName || email.split('@')[0];
+        let user = await User.findOne({ email });
+        
         if (!user) {
             user = new User({
                 first_name: displayName,
@@ -68,25 +58,26 @@ passport.use(new GitHubStrategy({
                 age: null,
                 password: '',
                 profile_image: profilePhoto
-            })
+            });
             
-            const newCart = new Cart()
-            await newCart.save()
-            user.cart = newCart._id
+            const newCart = new Cart();
+            await newCart.save();
+            user.cart = newCart._id;
             
-            await user.save()
-            console.log(user)
+            await user.save();
         }
-        return done(null, user)
+        return done(null, user);
     } catch (err) {
-        return done(err)
+        return done(err);
     }
 }))
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:8080/auth/google/callback"
+    callbackURL: isProduction 
+        ? "http://localhost:8080/auth/google/callback" 
+        : "https://2dapreentregabackend-production.up.railway.app/auth/google/callback"
 }, async (token, tokenSecret, profile, done) => {
     try {
         if (!profile.emails || !profile.emails[0].value) {
@@ -119,7 +110,6 @@ passport.use(new GoogleStrategy({
             user.cart = newCart._id
 
             await user.save()
-            console.log(user)
         }
 
         return done(null, user)

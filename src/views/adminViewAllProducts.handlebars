@@ -13,6 +13,28 @@
             {{/if}}
         </div>
     </div>
+
+    <form method="GET" action="/adminViewAllProducts">
+        <div class="row mb-3">
+            {{#if (equals user.role "admin")}}
+                <div class="col" style="max-width: 450px;">
+                    <input type="text" name="owner" placeholder="Filtrar por propietario" class="form-control">
+                </div>
+            {{/if}}
+            <div class="col" style="max-width: 250px;">
+                <input type="number" name="stock" placeholder="Stock igual o menor a:" class="form-control">
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary" style="margin-right: 30px;">Filtrar</button>
+            </div>
+            <div>
+                <a href="/adminViewAllProducts" class="btn btn-primary">
+                        Limpiar filtros
+                    </a>
+            </div>
+        </div>
+    </form>
+
     {{#if products.length}}
         <table class="table table-dark table-striped">
             <thead>
@@ -21,6 +43,7 @@
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Precio</th>
+                    <th>Stock</th>
                     <th>Publicado por:</th>
                     <th></th>
                 </tr>
@@ -32,19 +55,20 @@
                         <td>{{this._id}}</td>
                         <td>{{this.name}}</td>
                         <td>${{this.price}}</td>
+                        <td>{{this.stock}}</td>
                         <td>{{this.owner}}</td>
                         <td>
                             <a href="/adminUpdateProduct/{{this._id}}" class="btn btn-info">✏</a>
                         </td>
                         <td>
-                            <a href="/adminDeleteProduct/{{_id}}" class="btn btn-info" id="deleteProductBtn">❌</a>
+                            <a href="/adminDeleteProduct/{{this._id}}" class="btn btn-info" id="deleteProductBtn">❌</a>
                         </td>
                     </tr>
                 {{/each}}
             </tbody>
         </table>
     {{else}}
-        <p>No hay productos disponibles! 😥</p>
+        <p>No publicaste ningún producto aún! 😥</p>
     {{/if}}
 </div>
 

@@ -1,277 +1,336 @@
 <body>
-    {{#if user}}
-        {{#if (equals user.role "user")}}
-            <h3 class="text-center">Bienvenido, 
-                <strong>
-                    {{user.first_name}}
-                </strong>
-            </h3>
-        {{else}}
-            <h3>
-                Bienvenido, usuario {{user.role}}:
-            </h3>
-            <h3>
-                <strong>{{user.first_name}}</strong>
-            </h3>
-        {{/if}}
+{{#if user}}
+    {{#if (equals user.role "user")}}
+        <h3 class="text-center">Bienvenido, 
+            <strong>
+                {{user.first_name}}
+            </strong>
+        </h3>
     {{else}}
-        <h3 class="text-center">
-            Inicia sesión para poder comprar!
-            <a href="/login" class="btn btn-info">Iniciar</a>
+        <h3>
+            Bienvenido, usuario {{user.role}}:
+        </h3>
+        <h3>
+            <strong>{{user.first_name}}</strong>
         </h3>
     {{/if}}
-    <div class="container mt-5" style="width: 1000px;">
-        <div class="row mb-4">
-            <div id="fixed-filters" class="fixed-filters col-md-3">
-                <div class="mb-3">
-                    <label for="query" class="form-label">¿Qué estás buscando?</label>
-                    <input type="text" id="query" class="form-control" oninput="fetchProducts()">
-                </div>
-                <br>
-                <div class="mb-3">
-                    <label for="sort" class="form-label">Ordenar por precio</label>
-                    <select id="sort" class="form-select" onchange="fetchProducts()">
-                        <option value="">Ninguno</option>
-                        <option value="asc">De menor a mayor</option>
-                        <option value="desc">De mayor a menor</option>
-                    </select>
-                </div>
-                <br>
-                <div class="mb-3">
-                    <label for="limit" class="form-label">Límite</label>
-                    <select id="limit" class="form-select" onchange="fetchProducts()">
-                        <option value="3">3</option>
-                        <option value="6">6</option>
-                        <option value="10" selected>10</option>
-                        <option value="20">20</option>
-                    </select>
-                </div>
-                <div id="category" class="mb-3">
-                    <label for="categoryFilter" class="form-label">Categoría</label>
-                    <div id="categoryFilter"></div>
-                </div>
-                <div>
-                    <a href="/products">Limpiar filtros</a>
-                </div>
+{{else}}
+    <a href="/login" class="btn btn-outline-dark">Inicia sesión</a>
+{{/if}}
+<div class="container mt-5" style="width: 1000px;">
+    <div class="row mb-4">
+        <div id="fixed-filters" class="fixed-filters col-md-3">
+            <div class="mb-3">
+                <label for="query" class="form-label">¿Qué estás buscando?</label>
+                <input type="text" id="query" class="form-control" oninput="fetchProducts()">
             </div>
-
-            <div class="col-md-9">
-                <div id="error-message" class="alert alert-danger" style="display: none;"></div>
-                <nav aria-label="Page navigation">
-                    <ul id="pagination" class="pagination justify-content-center"></ul>
-                </nav>
-                <div id="products" class="row mt-4">
-                </div>
-                <nav aria-label="Page navigation">
-                    <ul id="pagination" class="pagination justify-content-center"></ul>
-                </nav>
+            <br>
+            <div class="mb-3">
+                <label for="sort" class="form-label">Ordenar por precio</label>
+                <select id="sort" class="form-select" onchange="fetchProducts()">
+                    <option value="">Ninguno</option>
+                    <option value="asc">Menor precio</option>
+                    <option value="desc">Mayor precio</option>
+                </select>
+            </div>
+            <br>
+            <div class="mb-3">
+                <label for="limit" class="form-label">Límite</label>
+                <select id="limit" class="form-select" onchange="fetchProducts()">
+                    <option value="3">3</option>
+                    <option value="6">6</option>
+                    <option value="12" selected>12</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+            <div id="category" class="mb-3">
+                <label for="categoryFilter" class="form-label">Categoría</label>
+                <div id="categoryFilter"></div>
+            </div>
+            <div>
+                <a href="/products">Limpiar filtros</a>
             </div>
         </div>
+
+        <div class="col-md-9">
+            <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            <nav aria-label="Page navigation">
+                <ul id="pagination" class="pagination justify-content-center"></ul>
+            </nav>
+            <div id="products" class="row mt-4">
+            </div>
+            <nav aria-label="Page navigation">
+                <ul id="pagination" class="pagination justify-content-center"></ul>
+            </nav>
+        </div>
     </div>
+</div>
 
-    <style>
-        .fixed-filters {
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-            max-height: calc(100vh - 80px);
-            overflow-y: auto;
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+<script>
+    function formatDate(dateString) {
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
         }
-        @media (max-width: 992px) {
-            .fixed-filters {
-                position: relative;
-                top: initial;
-                max-height: initial;
-                overflow-y: initial;
-                background-color: initial;
-                padding: initial;
-                box-shadow: initial;
-                border-radius: initial;
-            }
+        const date = new Date(dateString)
+        return date.toLocaleDateString('es-AR', options)
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadCategories()
+        fetchProducts()
+
+        const fixedFilters = document.getElementById('fixed-filters')
+        const mainContent = document.querySelector('.col-md-9')
+
+        const adjustFiltersPosition = () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+            const topPosition = mainContent.offsetTop - scrollTop
+            fixedFilters.style.top = `${Math.max(topPosition, 20)}px`
         }
-    </style>
 
-    <script>
-        function formatDate(dateString) {
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric', 
-                hour: 'numeric', 
-                minute: 'numeric', 
-            }
-            const date = new Date(dateString)
-            return date.toLocaleDateString('es-AR', options)
+        window.addEventListener('scroll', adjustFiltersPosition)
+        window.addEventListener('resize', adjustFiltersPosition)
+    })
+
+    async function loadCategories() {
+        const response = await fetch('/api/products/categories')
+        const data = await response.json()
+        const categoryDiv = document.getElementById('categoryFilter')
+
+        if (data.status === 'success') {
+            categoryDiv.innerHTML = data.categories.map(category => `
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="category-${category}" value="${category}" onchange="fetchProducts()">
+                    <label class="form-check-label" for="category-${category}">${category}</label>
+                </div>
+            `).join('')
         }
-    
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadCategories()
-            fetchProducts()
+    }
 
-            const fixedFilters = document.getElementById('fixed-filters')
-            const mainContent = document.querySelector('.col-md-9')
+    async function fetchProducts(page = 1) {
+        const limit = document.getElementById('limit').value
+        const sort = document.getElementById('sort').value
+        const query = document.getElementById('query').value
+        const categories = Array.from(document.querySelectorAll('.form-check-input:checked')).map(input => input.value)
 
-            const adjustFiltersPosition = () => {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                const topPosition = mainContent.offsetTop - scrollTop
-                fixedFilters.style.top = `${Math.max(topPosition, 20)}px`
-            }
+        let url = `/api/products?limit=${limit}&page=${page}`
+        if (sort) url += `&sort=${sort}`
+        if (query) url += `&query=${query}`
+        if (categories.length > 0) url += `&categories=${categories.join(',')}`
 
-            window.addEventListener('scroll', adjustFiltersPosition)
-            window.addEventListener('resize', adjustFiltersPosition)
-        })
-
-        async function loadCategories() {
-            const response = await fetch('/api/products/categories')
+        try {
+            const response = await fetch(url)
             const data = await response.json()
-            const categoryDiv = document.getElementById('categoryFilter')
 
             if (data.status === 'success') {
-                categoryDiv.innerHTML = data.categories.map(category => `
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="category-${category}" value="${category}" onchange="fetchProducts()">
-                        <label class="form-check-label" for="category-${category}">${category}</label>
-                    </div>
-                `).join('')
-            }
-        }
+                const productsDiv = document.getElementById('products')
+                const paginationDiv = document.getElementById('pagination')
+                const errorMessageDiv = document.getElementById('error-message')
 
-        async function fetchProducts(page = 1) {
-            const limit = document.getElementById('limit').value
-            const sort = document.getElementById('sort').value
-            const query = document.getElementById('query').value
-            const categories = Array.from(document.querySelectorAll('.form-check-input:checked')).map(input => input.value)
-
-            let url = `/api/products?limit=${limit}&page=${page}`
-            if (sort) url += `&sort=${sort}`
-            if (query) url += `&query=${query}`
-            if (categories.length > 0) url += `&categories=${categories.join(',')}`
-
-            try {
-                const response = await fetch(url)
-                const data = await response.json()
-
-                if (data.status === 'success') {
-                    const productsDiv = document.getElementById('products')
-                    const paginationDiv = document.getElementById('pagination')
-                    const errorMessageDiv = document.getElementById('error-message')
-
-                    errorMessageDiv.style.display = 'none'
-                    productsDiv.innerHTML = data.payload.map(product => `
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" style="height: 150px" alt="${product.description}"><a href="/products/${product._id}" class="btn btn-outline-info">Ver Detalle</a></img>
-                                <div class="card-body">
-                                    <h5 class="card-title">${product.name}</h5>
-                                    <p class="card-text">${product.description}</p>
-                                    <p class="card-text"><strong>Precio:</strong> $${product.price}</p>
-                                    <p class="card-text"><strong>Stock:</strong> ${product.stock}</p>
-                                    {{#if (different user.role "admin")}}
-                                        ${product.stock === 0 ?
-                                        `<button class="btn btn-danger" style="cursor: not-allowed" disabled>Sin stock</button>` : 
-                                        (product.stock !== 0 ? 
-                                            `<button class="add-cart btn btn-success" data-product-id="${product._id}" data-product-stock="${product.stock}">Agregar al carrito</button>` : 
-                                            ``)}
-                                    {{/if}}
-                                </div>
-                                <div class="card-footer">
-                                    <small class="text-muted">Publicado por: ${product.owner}</small>
-                                    <br>
-                                    <small class="text-muted">Updated: ${formatDate(product.updatedAt)}</small>
-                                </div>
+                errorMessageDiv.style.display = 'none'
+                productsDiv.innerHTML = data.payload.map(product => `
+                    <div class="col-md-4 mb-4">
+                        <div class="card product-card">
+                            <a href="/products/${product._id}">
+                                <img src="${product.thumbnail}" class="card-img-top img-fluid card-img-custom" alt="${product.description}">
+                            </a>
+                            <a href="/products/${product._id}" class="btn btn-outline-info view-detail-btn" style="width:200px">Ver Detalle</a>
+                            <div class="card-body">
+                                <h5 class="card-title">${product.name}</h5>
+                                <p class="card-text">${product.description}</p>
+                                <p class="card-text"><strong>Precio:</strong> $${product.price}</p>
+                                <p class="card-text"><strong>Stock:</strong> ${product.stock}</p>
+                                {{#if (different user.role "admin")}}
+                                    ${product.stock === 0 ?
+                                    `<button class="btn btn-danger" style="cursor: not-allowed" disabled>Sin stock</button>` : 
+                                    (product.stock !== 0 ? 
+                                        `<button class="add-cart btn btn-success" data-product-id="${product._id}" data-product-stock="${product.stock}">Agregar al carrito</button>` : 
+                                        ``)}
+                                {{/if}}
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">Publicado por: ${product.owner}</small><br>
+                                <small class="text-muted">Actualizado: ${formatDate(product.updatedAt)}</small>
                             </div>
                         </div>
-                    `).join('')
+                    </div>
+                `).join('')
 
-                    paginationDiv.innerHTML = `
-                        ${data.hasPrevPage ? `<li class="page-item"><a class="page-link" href="#" onclick="fetchProducts(${data.prevPage})">Anterior</a></li>` : ''}
-                        <li class="page-item disabled"><a class="page-link" href="#">Página ${data.page} de ${data.totalPages}</a></li>
-                        ${data.hasNextPage ? `<li class="page-item"><a class="page-link" href="#" onclick="fetchProducts(${data.nextPage})">Siguiente</a></li>` : ''}
-                    `
+                paginationDiv.innerHTML = `
+                    ${data.hasPrevPage ? `<li class="page-item"><a class="page-link" href="#" onclick="fetchProducts(${data.prevPage})">Anterior</a></li>` : ''}
+                    <li class="page-item disabled"><a class="page-link" href="#">Página ${data.page} de ${data.totalPages}</a></li>
+                    ${data.hasNextPage ? `<li class="page-item"><a class="page-link" href="#" onclick="fetchProducts(${data.nextPage})">Siguiente</a></li>` : ''}
+                `
 
-                    addToCart()
-                } else {
-                    throw new Error(data.message)
-                }
-            } catch (error) {
-                const errorMessageDiv = document.getElementById('error-message')
-                errorMessageDiv.textContent = error.message
-                errorMessageDiv.style.display = 'block'
-                document.getElementById('products').innerHTML = ''
-                document.getElementById('pagination').innerHTML = ''
+                addToCart()
+            } else {
+                throw new Error(data.message)
             }
+        } catch (error) {
+            const errorMessageDiv = document.getElementById('error-message')
+            errorMessageDiv.textContent = error.message
+            errorMessageDiv.style.display = 'block'
+            document.getElementById('products').innerHTML = ''
+            document.getElementById('pagination').innerHTML = ''
         }
+    }
 
-        function addToCart() {
-        document.querySelectorAll('.add-cart').forEach(button => {
-            button.addEventListener('click', async (event) => {
-                const productId = button.getAttribute('data-product-id')
-                const cartId = '{{cartId}}'
-                const productStock = parseInt(button.getAttribute('data-product-stock'), 10)
+    function addToCart() {
+    document.querySelectorAll('.add-cart').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const productId = button.getAttribute('data-product-id')
+            const cartId = '{{cartId}}'
+            const productStock = parseInt(button.getAttribute('data-product-stock'), 10)
 
-                try {
-                    const { value: cantidad } = await Swal.fire({
-                        title: 'Selecciona la cantidad',
-                        input: 'number',
-                        inputLabel: `Cantidad (máximo ${productStock} unidades):`,
-                        inputPlaceholder: 'Ingrese la cantidad',
-                        inputAttributes: {
-                            min: 1,
-                            max: productStock,
-                            step: 1
-                        },
-                        showCancelButton: true,
-                        confirmButtonText: 'Agregar al carrito',
-                        cancelButtonText: 'Cancelar',
-                        allowOutsideClick: false,
-                        inputValidator: (value) => {
-                            const cantidad = parseInt(value, 10)
-                            if (!value) {
-                                return 'Debes ingresar una cantidad'
-                            } else if (cantidad > productStock) {
-                                return `Solo puedes agregar hasta ${productStock} unidades`
-                            } else if (cantidad < 1) {
-                                return 'La cantidad debe ser al menos 1'
-                            }
-                        }
-                    })
-
-                    if (cantidad) {
-                        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ productId, cantidad })
-                        })
-                        const data = await response.json()
-
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                title: '¡Éxito!',
-                                text: 'Producto agregado al carrito.',
-                                icon: 'success',
-                                showCancelButton: true,
-                                confirmButtonText: 'Ir al carrito',
-                                cancelButtonText: 'Continuar comprando'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = `/carts/${cartId}`
-                                }
-                            })
-                        } else {
-                            Swal.fire('Error', 'No se pudo agregar el producto al carrito.', 'error')
+            try {
+                const { value: cantidad } = await Swal.fire({
+                    title: 'Selecciona la cantidad',
+                    input: 'number',
+                    inputLabel: `Cantidad (máximo ${productStock} unidades):`,
+                    inputPlaceholder: 'Ingrese la cantidad',
+                    inputAttributes: {
+                        min: 1,
+                        max: productStock,
+                        step: 1
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Agregar al carrito',
+                    cancelButtonText: 'Cancelar',
+                    allowOutsideClick: false,
+                    inputValidator: (value) => {
+                        const cantidad = parseInt(value, 10)
+                        if (!value) {
+                            return 'Debes ingresar una cantidad'
+                        } else if (cantidad > productStock) {
+                            return `Solo puedes agregar hasta ${productStock} unidades`
+                        } else if (cantidad < 1) {
+                            return 'La cantidad debe ser al menos 1'
                         }
                     }
-                } catch (error) {
-                    Swal.fire('Error', 'Ocurrió un error al agregar el producto al carrito.', 'error')
+                })
+
+                if (cantidad) {
+                    const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId, cantidad })
+                    })
+                    const data = await response.json()
+
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            title: '¡Éxito!',
+                            text: 'Producto agregado al carrito.',
+                            icon: 'success',
+                            showCancelButton: true,
+                            confirmButtonText: 'Ir al carrito',
+                            cancelButtonText: 'Continuar comprando'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = `/carts/${cartId}`
+                            }
+                        })
+                    } else {
+                        Swal.fire('Error', 'No puedes agregar un producto propio al carrito.', 'error')
+                    }
                 }
-            })
+            } catch (error) {
+                Swal.fire('Error', 'Debes loguearte para poder comprar', 'error')
+            }
         })
+    })
+}
+</script>
+<style>
+    .fixed-filters {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    </script>
+    @media (max-width: 992px) {
+        .fixed-filters {
+            position: relative;
+            top: initial;
+            max-height: initial;
+            overflow-y: initial;
+            background-color: initial;
+            padding: initial;
+            box-shadow: initial;
+            border-radius: initial;
+        }
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+    .card-title {
+        margin-bottom: 10px;
+    }
+    .card-text {
+        margin-bottom: 15px;
+    }
+    .card-img-custom {
+        height: 180px;
+        object-fit: cover;
+        border-bottom: 1px solid #ddd;
+    }
+    .card {
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .card-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .card-footer {
+        background-color: #f8f9fa;
+        font-size: 0.85rem;
+        text-align: right;
+    }
+    .product-card {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: scale(1.10);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .view-detail-btn {
+        position: absolute;
+        top: 35%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        background-color: rgba(255, 255, 255, 0.7);
+        transition: opacity 0.3s ease;
+        z-index: 10;
+    }
+
+    .product-card:hover .view-detail-btn {
+        opacity: 1;
+    }
+
+    .card-img-custom {
+        height: 180px;
+        object-fit: cover;
+        transition: opacity 0.3s ease;
+    }
+</style>
 </body>

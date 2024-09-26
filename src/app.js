@@ -3,6 +3,7 @@ import swaggerDocs from './config/swaggerConfig.js'
 import dotenv from 'dotenv'
 import session from 'express-session'
 import mongoose from './config/dbConfig.js'
+import morgan from 'morgan'
 import passport from 'passport'
 import methodOverride from 'method-override'
 import MongoStore from 'connect-mongo'
@@ -16,6 +17,7 @@ import productsRouter from './routes/api/productsRouter.js'
 import userRouter from './routes/api/userRouter.js'
 import cartRouter from './routes/api/cartRouter.js'
 import chatRouter from './routes/api/chatRouter.js'
+import paymentRouter from './routes/api/paymentRouter.js'
 import viewsRouter from './routes/views/viewsRouter.js'
 import './config/passportConfig.js'
 import handleErrors from './middlewares/errorHandler.js'
@@ -45,11 +47,9 @@ app.use(session({
     }
 }))
 
-/* app.use((req, res, next) => {
-    logger.http(`${req.method} ${req.url}`)
-    next()
-}) */
-
+if (process.env.NODE_ENV === 'production') {
+    app.use(morgan('dev'))
+}
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(handleErrors)
@@ -97,12 +97,13 @@ app.use('/api/chat', chatRouter)
 app.use('/', userRouter)
 app.use('/', viewsRouter)
 app.use('/', loggerRouter)
+app.use('/api/payment', paymentRouter)
 
 const PORT = process.env.PORT
-const LOGGER = process.env.LOGGER_ENV
+const MODE = process.env.NODE_ENV
 
 server.listen(PORT, () => {
-    if (LOGGER === 'production') {
+    if (MODE === 'production') {
         console.log(`Server is in production mode`)
         console.log(`Server is running on http://localhost:${PORT}/login`)
         console.log('Logger is in production mode, running on http://localhost:8080/loggertestview')

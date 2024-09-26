@@ -1,13 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
 import {
     getProducts as getProductsService,
-    getCategories as getCategoriesService
+    getCategories as getCategoriesService,
+    addProduct as addProductService
 } from '../services/productsService.js'
 
 import { createCustomError, errorTypes } from '../utils/errors.js'
 import MockingProduct from '../models/mockingProductsModel.js'
 import { generateMockProducts } from '../utils/generateMockProducts.js'
 import logger from '../utils/logger.js'
+import Product from '../models/productModel.js'
 
 export const getProducts = async (req, res) => {
     try {
@@ -111,5 +113,44 @@ export const createProduct = async (req, res, next) => {
         })
     } catch (error) {
         next(error)
+    }
+}
+
+export const addProduct = async (req, res) => {
+    try {
+        const { name, description, price, stock, status, category, thumbnail } = req.body
+        const product = await addProductService(name, description, price, stock, status, category, thumbnail)
+        res.json({ status: 'success', message: 'Producto agregado', data: product })
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message })
+    }
+}
+
+export const rateProduct = async (req, res) => {
+    const { pid } = req.params
+    const { rating, comment } = req.body
+    const userId = req.user.email
+
+    try {
+        const product = await Product.findById(pid)
+
+        if (!comment) {
+            return res.status(400).json({ status: 'error', message: 'El comentario es obligatorio.' })
+        }
+
+        if (rating) {
+            if (rating < 1 || rating > 5) {
+                return res.status(400).json({ status: 'error', message: 'La puntuación debe estar entre 1 y 5.' })
+            }
+            product.ratings.push({ userId, rating })
+        }
+
+        product.comments.push({ userId, comment })
+
+        await product.save()
+        res.json({ status: 'success', message: 'Valoración y comentario guardados.' })
+    } catch (error) {
+        console.error('Error al guardar la valoración:', error)
+        res.status(500).json({ status: 'error', message: 'Error al guardar la valoración.' })
     }
 }

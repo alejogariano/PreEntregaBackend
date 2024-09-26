@@ -7,7 +7,6 @@ const userRepository = {
     deleteUser: async (id) => await User.findByIdAndDelete(id),
     getUserByEmail: async (email) => await User.findOne({ email }),
     createUser: async (userData) => await User.create(userData),
-    createAdmin: async (userData) => await User.create(userData),
     createMessage: async (messageData) => {
         const Message = mongoose.model('Message', new mongoose.Schema({
             user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

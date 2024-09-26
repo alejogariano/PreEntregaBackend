@@ -1,0 +1,32 @@
+<body></body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Pasarelas de pago</h1>
+        <div class="card">
+            <div class="card-body text-center">
+                <p>Haz clic en el botón para proceder con el pago usando Stripe:</p>
+                <button id="stripe-btn" class="btn btn-primary btn-lg mb-3">Pagar con Stripe</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('stripe-btn').addEventListener('click', async () => {
+            const cartId = "{{cart._id}}"
+            const response = await fetch('/api/payment/stripe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cartId })
+            })
+
+            const data = await response.json()
+
+            if (data.status === 'success') {
+                window.location.href = data.url
+            } else {
+                alert('Error al iniciar el proceso de pago con Stripe')
+            }
+        })
+    </script>
+</body>

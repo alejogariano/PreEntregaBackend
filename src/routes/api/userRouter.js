@@ -4,6 +4,9 @@ import {
     updateProfile,
     updateDocumentsProfile,
     deleteUser,
+    adminDeleteUser,
+    deleteInactiveUsers,
+    adminChangeUserRole,
     sendMessageUser,
     loginUserHandler,
     registerUserHandler,
@@ -27,6 +30,9 @@ router.post('/profile/:uid/documents', upload.fields([
     { name: 'documents[accountStatement]', maxCount: 1 }
 ]), updateDocumentsProfile)
 router.delete('/profile/:uid', deleteUser)
+router.delete('/adminViewAllUsers/:uid', adminDeleteUser)
+router.delete('/adminViewAllUsers', deleteInactiveUsers)
+router.post('/adminViewAllUsers/:uid/role', adminChangeUserRole)
 router.post('/chat', sendMessageUser)
 
 router.post('/login', loginUserHandler)

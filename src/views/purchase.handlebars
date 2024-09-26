@@ -1,6 +1,6 @@
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">Verificar datos del ticket</h1>
+        <h1 class="mb-4">Datos del ticket</h1>
         <div class="card">
             <div class="card-header">
                 Detalle del Carrito
@@ -18,19 +18,25 @@
                             </li>
                         {{/each}}
                     </ul>
-                    <a href="/carts/{{cart._id}}" class="btn btn-info">Volver al carrito</a>
-                    <br>
+                    <div style="display: flex; justify-content:space-between">
+                        <h4>Total: ${{calculateTotal cart.products}}</h4>
+                    </div>
                     <br>
                     <br>
                     <hr>
-                    <button id="purchase-email-btn" class="btn btn-success btn-block">Confirmar - Recibir confirmación por email</button>
-                    <br>
-                    <hr>
-                    <div class="mt-2">
-                        <h5>Recuerda incresar la característica de tu país!</h5>
-                        <p>Ejemplo: +54 11 56633310</p>
-                        <input type="text" id="phone-number" class="form-control mb-2" placeholder="Ingresa tu número de teléfono">
-                        <button id="purchase-sms-btn" class="btn btn-primary btn-block">Confirmar - Recibir confirmación por email y SMS</button>
+                    <div id="payment-button-container" style="display:none;">
+                        <a href="/carts/{{cart._id}}/payment-options">
+                            <button class="btn btn-success">Confirmar Compra - Proceder al pago</button>
+                        </a>
+                    </div>
+                    <div id="payment-success-message" style="display:none;">
+                        <h2>Su pago fué acreditado</h2>
+                        <button id="purchase-email-btn" class="btn btn-success btn-block">
+                            Recibir email con los detalles para finalizar la compra!
+                        </button>
+                    </div>
+                    <div id="payment-error-message" style="display:none;">
+                        <p class="text-danger">Hubo un problema con su pago. Por favor, intente nuevamente.</p>
                     </div>
                 {{else}}
                     <p class="text-muted">No hay productos en el carrito.</p>
@@ -40,15 +46,28 @@
     </div>
 
     <script>
-        const handlePurchase = (url, phoneNumber) => {
-            const payload = phoneNumber ? { phoneNumber } : {}
+        const queryParams = new URLSearchParams(window.location.search)
+        const status = queryParams.get('status')
 
+        if (status === 'success') {
+            document.getElementById('payment-success-message').style.display = 'block'
+        } else {
+            document.getElementById('payment-button-container').style.display = 'block'
+            if (status === 'error') {
+                document.getElementById('payment-error-message').style.display = 'block'
+            }
+        }
+
+        document.getElementById('purchase-email-btn')?.addEventListener('click', () => {
+            handlePurchase(`/api/carts/{{cart._id}}/purchase?method=email`)
+        })
+
+        const handlePurchase = (url) => {
             fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
+                }
             })
             .then(response => response.json())
             .then(data => {
@@ -81,15 +100,9 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Ocurrió un error al realizar la compra'
+                    text: 'Ocurrió un error al enviar el email'
                 })
             })
         }
-
-        document.getElementById('purchase-email-btn').addEventListener('click', () => handlePurchase(`/api/carts/{{cart._id}}/purchase?method=email`))
-        document.getElementById('purchase-sms-btn').addEventListener('click', () => {
-            const phoneNumber = document.getElementById('phone-number').value
-            handlePurchase(`/api/carts/{{cart._id}}/purchase?method=sms`, phoneNumber)
-        })
     </script>
 </body>

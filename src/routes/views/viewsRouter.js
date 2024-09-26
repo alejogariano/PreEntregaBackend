@@ -1,16 +1,32 @@
 import express from 'express'
+import dotenv from 'dotenv'
 import { authorizeRoles, checkUser } from '../../middlewares/authMiddleware.js'
 import User from '../../models/userModel.js'
 import Cart from '../../models/cartModel.js'
 import Product from '../../models/productModel.js'
 import Message from '../../models/messageModel.js'
 import MockingProduct from '../../models/mockingProductsModel.js'
+import jwt from 'jsonwebtoken'
+import transporter from '../../config/emailConfigs.js'
 
+dotenv.config()
 const router = express.Router()
 
 const getPopulatedCart = async (cartId) => {
     try {
         const cart = await Cart.findById(cartId).populate('products.product').lean()
+
+        if (!cart) {
+            throw new Error('Carrito no encontrado')
+        }
+
+        const validProducts = cart.products.filter(item => item.product !== null)
+
+        if (validProducts.length !== cart.products.length) {
+            cart.products = validProducts
+            await Cart.findByIdAndUpdate(cartId, { products: validProducts })
+        }
+
         return cart
     } catch (error) {
         throw new Error('Error al obtener el carrito')
@@ -18,11 +34,26 @@ const getPopulatedCart = async (cartId) => {
 }
 
 router.get('/', async (req, res) => {
-    res.render('home', {
-        style: 'style.css',
-        user: res.locals.user,
-        cart: res.locals.cart
-    })
+    try {
+        const bestsellingProducts = await Product.find({ sales: { $gt: 0 } })
+            .sort({ sales: -1 })
+            .limit(10)
+
+        const ratedProducts = await Product.find({ ratings: { $exists: true, $not: { $size: 0 } } })
+            .sort({ 'ratings.rating': -1 })
+            .limit(10)
+
+        res.render('home', {
+            style: 'style.css',
+            user: res.locals.user,
+            cart: res.locals.cart,
+            bestsellingProducts,
+            ratedProducts
+        })
+    } catch (error) {
+        console.error("Error al obtener productos", error)
+        res.status(500).send("Error interno del servidor")
+    }
 })
 
 router.get('/products', checkUser, async (req, res) => {
@@ -158,7 +189,7 @@ router.get('/profile/:uid/documents', authorizeRoles(['user', 'premium']), async
     })
 })
 
-router.get('/:cid/purchase', authorizeRoles(['user', 'premium']), async (req, res) => {
+router.get('/carts/:cid/purchase', authorizeRoles(['user', 'premium']), async (req, res) => {
     try {
         const cartId = req.params.cid
         const cart = await getPopulatedCart(cartId)
@@ -171,6 +202,22 @@ router.get('/:cid/purchase', authorizeRoles(['user', 'premium']), async (req, re
     } catch (error) {
         console.error('Error al obtener el carrito:', error)
         res.status(500).render('purchase', { error: error.message })
+    }
+})
+
+router.get('/carts/:cid/payment-options', authorizeRoles(['user', 'premium']), async (req, res) => {
+    try {
+        const cartId = req.params.cid
+        const cart = await getPopulatedCart(cartId)
+
+        res.render('paymentOptions', {
+            cart,
+            style: 'style.css',
+            user: res.locals.user
+        })
+    } catch (error) {
+        console.error('Error al obtener el carrito:', error)
+        res.status(500).render('checkout', { error: error.message })
     }
 })
 
@@ -197,14 +244,28 @@ router.get('/purchases', authorizeRoles(['user', 'premium']), async (req, res) =
                 model: 'Product'
             }
         })
+
+        const formattedPurchases = populatedUser.purchases.map(purchase => {
+            const options = {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }
+            const formattedDate = new Intl.DateTimeFormat('es-AR', options).format(purchase.date)
+            
+            return {
+                ...purchase._doc,
+                formattedDate
+            }
+        })
+
         res.render('userPurchases', {
             style: 'style.css',
             user: res.locals.user,
-            purchases: populatedUser.purchases
+            purchases: formattedPurchases
         })
     } catch (err) {
         res.status(500).json({ status: 'error', message: err.message })
-    }    
+    }
 })
 
 router.get('/adminDashboard', authorizeRoles(['admin']), async (req, res) => {
@@ -217,13 +278,23 @@ router.get('/adminDashboard', authorizeRoles(['admin']), async (req, res) => {
 router.get('/adminViewAllProducts', authorizeRoles(['admin', 'premium']), async (req, res) => {
     try {
         const user = req.user
-        let products
+        const { owner, stock } = req.query
 
-        if (user.role === 'admin') {
-            products = await Product.find().lean()
-        } else if (user.role === 'premium') {
-            products = await Product.find({ owner: user.email })
+        let filters = {}
+
+        if (user.role === 'premium') {
+            filters.owner = user.email
         }
+
+        if (user.role === 'admin' && owner) {
+            filters.owner = owner
+        }
+
+        if (stock) {
+            filters.stock = { $lte: Number(req.query.stock) }
+        }
+
+        const products = await Product.find(filters).lean()
 
         res.render('adminViewAllProducts', {
             user,
@@ -301,11 +372,40 @@ router.delete('/adminDeleteProduct/:pid', authorizeRoles(['premium', 'admin']), 
     res.send({ result: "success", payload: result })
 })
 
+export const sendEmail = async (to, subject, text) => {
+    try {
+        const mailOptions = {
+            from: process.env.EMAIL_USER_NODEMAILER,
+            to,
+            subject,
+            text,
+        }
+
+        await transporter.sendMail(mailOptions)
+    } catch (error) {
+        console.error(`Error al enviar correo a ${to}:`, error)
+    }
+}
+
 router.get('/adminDeleteProduct/:pid', authorizeRoles(['premium', 'admin']), async (req, res) => {
     try {
         const { pid } = req.params
+        const product = await Product.findById(pid)
+
+        if (!product) {
+            return res.status(404).render('error', { message: 'Producto no encontrado.' })
+        }
+
+        if (product.owner !== 'admin') {
+            await sendEmail(
+                product.owner,
+                'Producto Eliminado',
+                `Tu producto "${product.name}" ha sido eliminado.`
+            )
+        }
+
         await Product.findByIdAndDelete(pid)
-        
+
         res.redirect('/adminViewAllProducts')
     } catch (error) {
         console.error('Error al eliminar el producto:', error)

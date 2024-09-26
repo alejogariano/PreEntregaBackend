@@ -14,7 +14,7 @@
                                     <img style="width: 100px;" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMW45d211d2JmMDJjZDlpcWtwZDdsNXp5YWdlcHU5eWdxZ2pxN3gyayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/chqkdGI4dwLsujNlph/giphy.webp" alt="">
                                     <button style="display: flex; align-items:center; gap:15px" class="btn btn-outline-dark accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{@index}}" aria-expanded="false" aria-controls="collapse{{@index}}">
                                         <div>
-                                            <small><p>Fecha: {{this.createdAt}}</p></small>
+                                            <small><p>Fecha de compra: {{formattedDate}}</p></small>
                                             Código: <strong>{{this.code}}</strong>
                                             <br>
                                             Monto: <strong>${{this.amount}}</strong>
@@ -60,8 +60,4 @@
             <a href="/login" class="btn btn-info">Iniciar</a>
         </p>
     {{/if}}
-
-    {{!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> --}}
 </body>
